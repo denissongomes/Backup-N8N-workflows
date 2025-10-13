@@ -1,0 +1,467 @@
+{
+  "createdAt": "2025-10-06T11:01:50.880Z",
+  "updatedAt": "2025-10-12T16:04:25.093Z",
+  "id": "EsZoCHdOO8A9CbRP",
+  "name": "Workana AI Agent: Auto Update Jobs Workana Sheet",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "laDvQh1s3f8r5lC6",
+          "mode": "list",
+          "cachedResultName": "Workana AI Agent: Project Analyzer-v2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "started": "={{ $json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "started",
+              "displayName": "started",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        80
+      ],
+      "id": "5418b28b-9c43-4572-b8cc-66837d47d212",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        240,
+        80
+      ],
+      "id": "a171dd09-76f8-492c-914a-7adc5926b5fc",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Svi2bbLgAmyehipR",
+          "name": "Google Drive Trigger (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "value": "1WoeI2l6gu73erJhW0qvv-PjRwaD8D2ST",
+          "mode": "list",
+          "cachedResultName": "projects.csv",
+          "cachedResultUrl": "https://drive.google.com/file/d/1WoeI2l6gu73erJhW0qvv-PjRwaD8D2ST/view?usp=drivesdk"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        16,
+        80
+      ],
+      "id": "bf21a605-bd29-433e-94e7-865036828236",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Svi2bbLgAmyehipR",
+          "name": "Google Drive Trigger (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
+          "mode": "list",
+          "cachedResultName": "Jobs Workana",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "projects",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "title": "={{ $json.title }}",
+            "published_at": "={{ $json.published_at }}",
+            "description": "={{ $json.description }}",
+            "budget": "={{ $json.budget }}",
+            "category": "={{ $json.category }}",
+            "subcategory": "={{ $json.subcategory }}",
+            "skills": "={{ $json.skills }}",
+            "scope": "={{ $json.scope }}",
+            "prazo_entrega": "={{ $json.prazo_entrega }}",
+            "user_name": "={{ $json.user_name }}",
+            "user_link": "={{ $json.user_link }}",
+            "user_projects_published": "={{ $json.user_projects_published }}",
+            "user_projects_paid": "={{ $json.user_projects_paid }}",
+            "user_member_since": "={{ $json.user_member_since }}",
+            "proposals": "={{ $json.proposals }}",
+            "interested": "={{ $json.interested }}",
+            "project_link": "={{ $json.project_link }}",
+            "proposal_link": "={{ $json.proposal_link }}",
+            "question_link": "={{ $json.question_link }}",
+            "status": "todo"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "published_at",
+              "displayName": "published_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget",
+              "displayName": "budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subcategory",
+              "displayName": "subcategory",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "skills",
+              "displayName": "skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scope",
+              "displayName": "scope",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "prazo_entrega",
+              "displayName": "prazo_entrega",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_link",
+              "displayName": "user_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_projects_published",
+              "displayName": "user_projects_published",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_projects_paid",
+              "displayName": "user_projects_paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_member_since",
+              "displayName": "user_member_since",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "proposals",
+              "displayName": "proposals",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "interested",
+              "displayName": "interested",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "project_link",
+              "displayName": "project_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "proposal_link",
+              "displayName": "proposal_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "question_link",
+              "displayName": "question_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        80
+      ],
+      "id": "42679549-14e7-4060-85ab-c63d68d751ea",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        448,
+        80
+      ],
+      "id": "df82390d-5d84-41ef-b267-4eaeba84a4ef",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "content": "## ⚙ STEP 1: Auto Update Jobs Workana Sheet\n\nGoogle Sheets spreadsheet auto-update\n\n## **Objective**\nThis project performs the automated update of the Google Sheets spreadsheet **Jobs Workana** regarding the data extracted by the local python script web-scraping-workana.\n\n## **How ​​it Works**\n\n### 1. **Data Entry**:\nReceives the projects.csv file after the automated extraction of projects published on the Workana platform, using the local web-scraping-workana script.\n\n### 2. **Processing**:\nWhen the projects.csv file is updated, the Google Drive trigger is triggered, initiating the spreadsheet update process.\n\n### 3. **Conclusion**:\nAfter the spreadsheet is updated, the Workana AI Agent: Project Analyzer-v2 Sub-Workflow is called.\n",
+        "height": 688,
+        "width": 420
+      },
+      "id": "0b12b7de-6eca-4ddb-bd33-b9583d264451",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -528,
+        -160
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Google Drive Trigger": {
+      "lastTimeChecked": "2025-10-12T21:24:16Z"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1c6a9bb7-085f-4943-8442-151ced860a45",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
+    },
+    {
+      "createdAt": "2025-10-07T18:10:03.762Z",
+      "updatedAt": "2025-10-07T18:10:03.762Z",
+      "id": "pBpikzqjo5Xglfoj",
+      "name": "internal-infra"
+    }
+  ],
+  "n8n_host_name ": "https://n8n.trymyapp.tech/"
+}
