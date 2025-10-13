@@ -1,0 +1,647 @@
+{
+  "createdAt": "2025-09-20T12:58:35.267Z",
+  "updatedAt": "2025-10-12T19:13:46.235Z",
+  "id": "ib7w7KyNu8o6hxXo",
+  "name": "Workana AI Agent",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "759cf542-1de9-4a57-b973-05a39a5ff113",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        240,
+        656
+      ],
+      "webhookId": "89921f10-c333-4854-977f-57d621cb6350",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.description }}",
+        "options": {
+          "systemMessage": "You're a helpful, intelligent Workana assistant. Your task is to receive an Workana job description and then use it to generate assets, like Mermaid diagrams, Google Docs, and Workana application bodies. \n\nWhen you receive an Workana job description, you *must* generate a Mermaid diagram, a Google Doc proposal, and an Workana application. You must then replace the $$$ with the Google Doc proposal link.\n\nOutput the Google Doc proposal link in plaintext, like link: https://www..."
+        }
+      },
+      "id": "dca47962-d163-438a-ac2c-22723947d672",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        912,
+        368
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Google Sheets Trigger').item.json.id }}",
+        "contextWindowLength": 10
+      },
+      "id": "411a6745-1abc-490b-ae70-d10268eb8b6e",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        688,
+        672
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "name": "generate_workana_application_copy",
+        "description": "Call this tool to generate Workana application copy. The input will be an Workana job description, and the output will be the Workana application copy string from the tool.",
+        "workflowId": {
+          "__rl": true,
+          "value": "APTV78JPyznIjWGG",
+          "mode": "list",
+          "cachedResultName": "Workana AI Agent: Generate Application Copy"
+        }
+      },
+      "id": "ecf37a72-3e46-4af9-bb31-a49ce4741207",
+      "name": "Generate Application Copy",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        1232,
+        672
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "name": "generate_google_doc_proposal",
+        "description": "=Call this tool to generate a Google Doc proposal for an Workana job. The input should be a string of an Workana job post, and the output will be a proposal URL that you can use to fill in templates.",
+        "workflowId": {
+          "__rl": true,
+          "value": "jekyvEetvz05SuWB",
+          "mode": "list",
+          "cachedResultName": "Workana AI Agent: Generate Google Doc Proposal"
+        },
+        "responsePropertyName": "urlOfProposal",
+        "fields": {
+          "values": [
+            {
+              "name": "projectId",
+              "type": "numberValue",
+              "numberValue": "={{ $('Get row(s) in sheet').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "id": "b412e1da-c339-4667-8081-8bbd53f04944",
+      "name": "Generate Google Doc Proposal",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        1072,
+        672
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": "## 🤖 STEP 3: AI Agent Orchestration\n\nMain agent that coordinates all sub-workflows:\n\n**When chat message received**: Accepts Workana job descriptions\n**AI Agent**: Uses OpenAI with memory to maintain context\n**Tool Integration**: Calls three sub-workflows (application, proposal, diagram)\n**Smart Replacement**: Automatically replaces $$$ placeholders with actual Google Doc links\n\n**Business Value**: Transforms hours of manual proposal work into minutes of automated generation\n\n**Revenue Potential**: Based on $500K+ Upwork earnings using these exact templates and strategies",
+        "height": 416,
+        "width": 420
+      },
+      "id": "6048b96a-6f5f-4532-9af2-bb0e61201d61",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "name": "generate_mermaid_diagram",
+        "description": "Call this tool to generate Mermaid.js diagram code. The input will be an Workana job description, and the output will be the mermaid diagram code.",
+        "workflowId": {
+          "__rl": true,
+          "value": "i9KhQQ2MrFqy7Vij",
+          "mode": "list",
+          "cachedResultName": "Workana AI Agent: Generate Mermaid.js"
+        },
+        "responsePropertyName": "mermaidCode"
+      },
+      "id": "b05d30fd-b2a9-4af3-827a-64df8642c8a9",
+      "name": "Generate Mermaid.js",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        864,
+        672
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": "GPT-5-nano",
+        "options": {}
+      },
+      "id": "9d5cdfef-68bb-40bd-8c00-00d6039d8d95",
+      "name": "GPT-5-nano Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        528,
+        672
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "c7JjRgSwZclMpl7P",
+          "name": "Poe account (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
+          "mode": "list",
+          "cachedResultName": "Jobs Workana",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1879327603,
+          "mode": "list",
+          "cachedResultName": "analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit#gid=1879327603"
+        },
+        "event": "rowUpdate",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        448,
+        368
+      ],
+      "id": "acfb00cf-2bfb-4591-9a79-978366caa187",
+      "name": "Google Sheets Trigger",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "KDe7JVrKqzaRcjnm",
+          "name": "Google Sheets Trigger (denisson)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
+          "mode": "list",
+          "cachedResultName": "Jobs Workana",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1879327603,
+          "mode": "list",
+          "cachedResultName": "analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit#gid=1879327603"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "Proposal Presentation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        368
+      ],
+      "id": "6d13cb5f-fb46-489d-8f14-6d87a73fd53c",
+      "name": "Get row(s) in sheet",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "denissongomes@outlook.com.br",
+        "subject": "=Assets Workana ID:{{ $('Get row(s) in sheet').item.json.id }} - {{ $('Get row(s) in sheet').item.json.title }}",
+        "message": "={{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1664,
+        368
+      ],
+      "id": "36e94634-4999-4d64-9294-40565309e790",
+      "name": "Send a message",
+      "webhookId": "146e93e6-ee26-49a7-9058-e87454607649",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "EbaLSvv4O8D8FmB6",
+          "name": "Gmail Trigger (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "GPT-5-nano",
+        "options": {}
+      },
+      "id": "3f81f801-ad52-4471-b09f-d2d62d962961",
+      "name": "GPT-5-nano Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1360,
+        528
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "c7JjRgSwZclMpl7P",
+          "name": "Poe account (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "=Você é um assistente de e-mail inteligente e prestativo. Sua tarefa é receber um texto puro (sem formatação) e gerar um e-mail em HTML com parágrafos organizados.\n\nRegras:\nTransforme o texto recebido em um corpo de e-mail HTML; preserve a ordem original das frases.\n\nCategorize o conteúdo por ativos, como diagramas Mermaid, Google Docs e Workana application copy.\n\nSepare o conteúdo em parágrafos HTML (<p>...</p>) para cada bloco de ideia, mantendo coesão e clareza.\nNão inclua formatações estranhas (semster qualquer formatação fora de HTML). Use apenas tags básicas: <html>, <body>, <p>, <br>, <strong> quando necessário, e <a> se houver URLs no texto.\nNão inclua estilos inline complicados a menos que sejam úteis para legibilidade; se usar CSS, mantenha simples e dentro de uma tag <style> no <head>.\nUse uma linha de assunto (<h1> ou <title> no <head> ou <h2> dentro do corpo) que reflita o tema do texto, se o texto indicar um assunto; caso contrário, utilize “Assunto: [Resumo do conteúdo]”.\nInclua um rodapé mínimo com assinatura genérica (ex.: “Atenciosamente, [Seu Nome]”) e informações de contato se fornecidas no texto.\nNão adicione conteúdo que não esteja no texto de entrada; não reescreva com muito de forma diferente.\nGaranta que o HTML seja válido e bem estruturado.\nFormato de saída: apenas o HTML do e-mail completo (sem explicações adicionais).\n"
+        }
+      },
+      "id": "03308d70-5245-44f7-a5f7-0c0c614842e4",
+      "name": "Email Writer AI",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1312,
+        368
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
+          "mode": "list",
+          "cachedResultName": "Jobs Workana",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1879327603,
+          "mode": "list",
+          "cachedResultName": "analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit#gid=1879327603"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get row(s) in sheet').item.json.id }}",
+            "status": "Follow-up"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "complexity",
+              "displayName": "complexity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "analysis",
+              "displayName": "analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "why_fit",
+              "displayName": "why_fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scope_outline",
+              "displayName": "scope_outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "delivery_time_estimate",
+              "displayName": "delivery_time_estimate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "price_range",
+              "displayName": "price_range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "risks",
+              "displayName": "risks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommendations",
+              "displayName": "recommendations",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1872,
+        368
+      ],
+      "id": "37d05a2f-7c5d-46c2-a89e-e362aa2dd154",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Application Copy": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Google Doc Proposal": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Mermaid.js": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-5-nano Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Email Writer AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-5-nano Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Writer AI",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Writer AI": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Google Sheets Trigger": {
+      "documentId": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
+      "sheetId": 1879327603,
+      "lastRevision": 511,
+      "lastRevisionLink": "https://docs.google.com/spreadsheets/export?id=1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio&revision=511&exportFormat=xlsx"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a122fda7-728d-443a-b72a-fabd0a8773fe",
+  "triggerCount": 2,
+  "tags": [
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
+    },
+    {
+      "createdAt": "2025-10-07T18:10:03.762Z",
+      "updatedAt": "2025-10-07T18:10:03.762Z",
+      "id": "pBpikzqjo5Xglfoj",
+      "name": "internal-infra"
+    }
+  ],
+  "n8n_host_name ": "https://n8n.trymyapp.tech/"
+}
