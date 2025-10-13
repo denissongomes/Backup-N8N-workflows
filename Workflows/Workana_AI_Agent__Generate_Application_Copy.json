@@ -1,0 +1,187 @@
+{
+  "createdAt": "2025-09-21T11:58:24.847Z",
+  "updatedAt": "2025-10-12T13:43:30.251Z",
+  "id": "APTV78JPyznIjWGG",
+  "name": "Workana AI Agent: Generate Application Copy",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "3c10187b-5291-4d73-aec1-ec31d738a5db",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -144,
+        176
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e980c92c-07d9-400e-b40c-a8fbdbe8bbcb",
+              "name": "aboutMe",
+              "type": "string",
+              "value": "Sou um freelancer desenvolvedor Full Stack com IA e automação, apaixonado por transformar ideias em soluções digitais incríveis que cria sistemas de divulgação, sistemas de CRM, sistemas de gerenciamento de projetos, sistemas sem código e integrações. Com formação em Análise e Desenvolvimento de Sistemas, pós-graduando em Análise de Dados e Inteligência Artificial, dedico-me a criar projetos que aliam qualidade, inovação e impacto real. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "912287c7-a75b-4d64-ac8e-d8936423cb32",
+      "name": "Set Variable",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        80,
+        176
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "468a03c7-1537-435a-9f98-ce7c58a51c8b",
+              "name": "response",
+              "type": "string",
+              "value": "={{ $json.message.content.proposal }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8e181f2d-b6cf-4b7e-be08-a55c415d1a95",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        656,
+        176
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "## 🎯 STEP 4: Application Copy Generation\n\nGenerates personalized Upwork application text:\n\n**Execute Workflow Trigger**: Receives job description from AI agent\n**Set Variable**: Contains personal social proof and achievements\n**OpenAI**: Creates custom application using proven templates\n**Edit Fields**: Formats response for agent consumption\n\n**Template Structure**: \"Hi, I do [thing] all the time. So confident I created a demo: $$$\"\n\n**Key**: Uses templated approach with AI filling specific variables, not generating entire proposal",
+        "height": 396,
+        "width": 416
+      },
+      "id": "231e9481-32b5-4192-8874-a49cb16dd0fc",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -608,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "GPT-5-nano",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent Workana application writer.",
+              "role": "system"
+            },
+            {
+              "content": "=I'm an automation specialist applying to jobs on freelance platforms.\n\nYour task is to take as input an Workana job description and return as output a customized proposal.\n\nHigh-performing proposals are typically templated as follows:\n\n```\nHi, I do {thing} all the time. Am so confident I'm the right fit for you that I just created a workflow diagram + a demo of your {thing} in no-code: $$$\n\nAbout me: I'm a {relevantJobDescription} that has done {coolRelevantThing}. Of note, {otherCoolTieIn}.\n\nHappy to do this for you anytime—just respond to this proposal (else I don't get a chat window). \n\nThank you!\n```\n\nOutput your results in JSON using this format:\n\n{\"proposal\":\"Your proposal\"}\n\nRules:\n- Always respond in Portuguese (pt-BR)\n- $$$ is what we're using to replace links later on, so leave that untouched.\n- Write in a casual, spartan tone of voice.\n- Don't use emojis or flowery language.\n- If there's a name included somewhere in the description, add it after \"Hi\"\n\nSome facts about me for the personalization: {{ $json.aboutMe }}\n"
+            },
+            {
+              "content": "={\"jobDescription\":\"{{ $('Execute Workflow Trigger').item.json.query }}\"}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "id": "705e82f9-4548-43f8-a994-f4cad4113c23",
+      "name": "Message GPT-5-nano model",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        304,
+        176
+      ],
+      "typeVersion": 1.6,
+      "credentials": {
+        "openAiApi": {
+          "id": "c7JjRgSwZclMpl7P",
+          "name": "Poe account (denisson.dev)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variable": {
+      "main": [
+        [
+          {
+            "node": "Message GPT-5-nano model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message GPT-5-nano model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c1c8e16d-040f-42ac-b427-dd77273aa707",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
+    },
+    {
+      "createdAt": "2025-10-10T13:21:49.645Z",
+      "updatedAt": "2025-10-10T13:21:49.645Z",
+      "id": "dPPdsd8YcJkrO0u5",
+      "name": "sub"
+    },
+    {
+      "createdAt": "2025-10-07T18:10:03.762Z",
+      "updatedAt": "2025-10-07T18:10:03.762Z",
+      "id": "pBpikzqjo5Xglfoj",
+      "name": "internal-infra"
+    }
+  ],
+  "n8n_host_name ": "https://n8n.trymyapp.tech/"
+}
