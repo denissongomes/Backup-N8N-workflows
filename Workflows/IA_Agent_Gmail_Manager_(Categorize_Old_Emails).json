@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-09-30T17:10:02.258Z",
-  "updatedAt": "2025-10-08T11:08:07.997Z",
+  "updatedAt": "2025-10-08T20:08:18.963Z",
   "id": "02k9hDwLB8BzZjqy",
   "name": "IA Agent Gmail Manager (Categorize Old Emails)",
   "active": true,
@@ -159,7 +159,8 @@
         "rule": {
           "interval": [
             {
-              "field": "hours"
+              "field": "hours",
+              "hoursInterval": 2
             }
           ]
         }
@@ -623,7 +624,7 @@
   "staticData": {
     "node:Schedule Trigger": {
       "recurrenceRules": [
-        8
+        0
       ]
     }
   },
@@ -631,21 +632,9 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "694bf4c4-421e-40cf-ab47-dcffd47c071c",
+  "versionId": "2c69bbdd-c513-47cc-aac1-bada1542948d",
   "triggerCount": 1,
   "tags": [
-    {
-      "createdAt": "2025-08-19T13:07:09.692Z",
-      "updatedAt": "2025-08-19T13:07:09.692Z",
-      "id": "Vc1kY3YuqEvHdFNy",
-      "name": "Personal"
-    },
-    {
-      "createdAt": "2025-09-06T18:51:55.029Z",
-      "updatedAt": "2025-09-06T18:51:55.029Z",
-      "id": "aqoahvvuwcUF7xAJ",
-      "name": "Production"
-    },
     {
       "createdAt": "2025-10-07T18:10:03.762Z",
       "updatedAt": "2025-10-07T18:10:03.762Z",
@@ -653,10 +642,10 @@
       "name": "internal-infra"
     },
     {
-      "createdAt": "2025-08-19T13:07:14.785Z",
-      "updatedAt": "2025-08-19T13:07:14.785Z",
-      "id": "diiOnhbawaisCwKc",
-      "name": "Business"
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
     }
   ],
   "n8n_host_name ": "https://n8n.trymyapp.tech/"
