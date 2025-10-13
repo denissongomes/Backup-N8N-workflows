@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-07T18:09:12.602Z",
-  "updatedAt": "2025-10-08T12:59:39.039Z",
+  "updatedAt": "2025-10-10T15:10:19.966Z",
   "id": "eN6cYwg8O0WM9YLV",
   "name": "Automatically document and backup N8N workflows",
   "active": true,
@@ -529,8 +529,7 @@
     {
       "parameters": {
         "filters": {
-          "activeWorkflows": true,
-          "tags": "internal-infra"
+          "tags": "internal-infra, prod"
         },
         "requestOptions": {}
       },
@@ -1016,7 +1015,7 @@
       }
     ]
   },
-  "versionId": "f8920e1c-0096-4a31-ab03-6ba4329a6a0c",
+  "versionId": "bcfb8a17-a41d-43da-8d23-ba5e12853cd8",
   "triggerCount": 1,
   "tags": [
     {
@@ -1026,16 +1025,10 @@
       "name": "internal-infra"
     },
     {
-      "createdAt": "2025-08-19T13:07:09.692Z",
-      "updatedAt": "2025-08-19T13:07:09.692Z",
-      "id": "Vc1kY3YuqEvHdFNy",
-      "name": "Personal"
-    },
-    {
       "createdAt": "2025-09-06T18:51:55.029Z",
-      "updatedAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
       "id": "aqoahvvuwcUF7xAJ",
-      "name": "Production"
+      "name": "prod"
     }
   ],
   "n8n_host_name ": "https://n8n.trymyapp.tech/"
