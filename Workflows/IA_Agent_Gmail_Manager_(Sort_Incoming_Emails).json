@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-09-29T21:10:52.215Z",
-  "updatedAt": "2025-10-08T11:08:22.554Z",
+  "updatedAt": "2025-10-12T19:47:20.674Z",
   "id": "LLmEEDRu329jdllU",
   "name": "IA Agent Gmail Manager (Sort Incoming Emails)",
   "active": true,
@@ -234,7 +234,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        1024,
+        976,
         496
       ],
       "id": "f98109a3-a433-4913-ba5c-fd4992db195b",
@@ -304,7 +304,8 @@
         576
       ],
       "id": "e0204d4c-560d-4200-8fd0-d73a454f6465",
-      "name": "Give a Label1"
+      "name": "Give a Label1",
+      "retryOnFail": true
     },
     {
       "parameters": {
@@ -359,7 +360,7 @@
         "operation": "addLabels",
         "messageId": "={{ $('Gmail Trigger').item.json.id }}",
         "labelIds": [
-          "Label_270919944387970160"
+          "Label_41"
         ]
       },
       "type": "n8n-nodes-base.gmail",
@@ -618,9 +619,9 @@
     },
     "node:Gmail Trigger": {
       "Gmail Trigger": {
-        "lastTimeChecked": 1759921702,
+        "lastTimeChecked": 1760302641,
         "possibleDuplicates": [
-          "199b9936e653ccd9"
+          "199da36ca97b57af"
         ]
       }
     }
@@ -629,26 +630,20 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "4ee621e1-65ef-4291-8c43-d751ae34fca5",
+  "versionId": "2d469e1e-7f30-44ba-a94f-055e3898f96b",
   "triggerCount": 1,
   "tags": [
-    {
-      "createdAt": "2025-08-19T13:07:09.692Z",
-      "updatedAt": "2025-08-19T13:07:09.692Z",
-      "id": "Vc1kY3YuqEvHdFNy",
-      "name": "Personal"
-    },
-    {
-      "createdAt": "2025-09-06T18:51:55.029Z",
-      "updatedAt": "2025-09-06T18:51:55.029Z",
-      "id": "aqoahvvuwcUF7xAJ",
-      "name": "Production"
-    },
     {
       "createdAt": "2025-10-07T18:10:03.762Z",
       "updatedAt": "2025-10-07T18:10:03.762Z",
       "id": "pBpikzqjo5Xglfoj",
       "name": "internal-infra"
+    },
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
     }
   ],
   "n8n_host_name ": "https://n8n.trymyapp.tech/"
