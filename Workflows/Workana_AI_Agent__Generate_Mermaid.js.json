@@ -1,0 +1,152 @@
+{
+  "createdAt": "2025-09-21T11:59:18.209Z",
+  "updatedAt": "2025-10-12T14:39:47.007Z",
+  "id": "i9KhQQ2MrFqy7Vij",
+  "name": "Workana AI Agent: Generate Mermaid.js",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "5d257b1f-74fa-4fe8-a670-bf8ac80bfb10",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        384,
+        256
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d47590b5-3683-4afe-bc27-a25fb94a32d5",
+              "name": "mermaidCode",
+              "type": "string",
+              "value": "={{ $json.message.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8f97c4c2-ef2a-42c0-8298-598278cbd61b",
+      "name": "Edit Fields2",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        944,
+        256
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "## 📊 STEP 6: Mermaid Diagram Generation\n\nCreates workflow diagrams for visual proposals:\n\n**OpenAI2**: Analyzes job requirements and generates Mermaid.js flowchart code\n**Edit Fields2**: Formats diagram code for agent use\n\n**Purpose**: Provides visual representation of proposed solution\n**Client Perception**: Demonstrates thorough analysis and professional approach\n\n**Example Output**: \"graph TD; A-->B; B-->C;\" (flowchart syntax)\n\n**Usage**: Copy code into Mermaid visualizer or Whimsical for client presentation",
+        "height": 412,
+        "width": 416
+      },
+      "id": "51d150d1-6d55-486b-abc0-15c1a99c4eef",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "GPT-5-nano",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent Mermaid.js code writer.",
+              "role": "system"
+            },
+            {
+              "content": "=Your task is to take as input an Workana job description and return as output a Mermaid diagram that I can visualize using a subsequent Mermaid.js tool.\n\nOutput your results in plaintext using Mermaid code formatting. Don't output anything but the Mermaid diagram code.\n\nHere's an example of what your output should look like:\n\ngraph TD;\n    A-->B;\n    A-->C;\n    B-->D;\n    C-->D;\n\nRules:\n- You only output flowcharts. Nothing else. No sequence diagrams, no Gantt charts—only flowcharts.\n- Do not output any accessory formatting information, like ```mermaid.\n- Your first character should be g."
+            },
+            {
+              "content": "={{ $json.query }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "id": "d9159efa-2be2-4a95-b2dc-0ea635b97eb4",
+      "name": "Message GPT-5-nano model",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        592,
+        256
+      ],
+      "typeVersion": 1.6,
+      "credentials": {
+        "openAiApi": {
+          "id": "c7JjRgSwZclMpl7P",
+          "name": "Poe account (denisson.dev)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message GPT-5-nano model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message GPT-5-nano model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "647c2ae4-c1a0-400a-834b-922a6ca9c0ad",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
+    },
+    {
+      "createdAt": "2025-10-10T13:21:49.645Z",
+      "updatedAt": "2025-10-10T13:21:49.645Z",
+      "id": "dPPdsd8YcJkrO0u5",
+      "name": "sub"
+    },
+    {
+      "createdAt": "2025-10-07T18:10:03.762Z",
+      "updatedAt": "2025-10-07T18:10:03.762Z",
+      "id": "pBpikzqjo5Xglfoj",
+      "name": "internal-infra"
+    }
+  ],
+  "n8n_host_name ": "https://n8n.trymyapp.tech/"
+}
