@@ -1,0 +1,1096 @@
+{
+  "createdAt": "2025-10-09T11:26:25.490Z",
+  "updatedAt": "2025-10-12T13:42:18.898Z",
+  "id": "laDvQh1s3f8r5lC6",
+  "name": "Workana AI Agent: Project Analyzer-v2",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        720
+      ],
+      "id": "4ed309c9-f9c5-4fd0-ad7d-d9aa7d40b6a8",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
+          "mode": "list",
+          "cachedResultName": "Jobs Workana",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "projects",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -576,
+        528
+      ],
+      "id": "2fed64db-0c4d-4a1d-afcd-e51ee921e041",
+      "name": "Get row(s) in sheet",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "projects",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        0,
+        528
+      ],
+      "id": "e9e76e7c-2e88-40e3-8f18-2aba244e018a",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        -1968,
+        416
+      ],
+      "id": "74fbef14-e900-4666-a33d-d5951aa908a4",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You're a helpful and intelligent freelance career coach. Analyze the projects provided and return only the top five, as instructed by the System. Use information about me to refine the fit when necessary.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=** Purpose **\n\nYou are an automation and lightweight development specialist focused on quick wins (Pareto 80/20). Your mission is to select and analyze Workana projects for a beginner freelancer with a background in ADS, a postgraduate degree in Data/AI, and basic knowledge of n8n, Python, JavaScript, PHP, and website development. Prioritize low- to medium-complexity projects with a clear scope and fast delivery, maximizing the chances of 5 stars and first wins.\n\n** Instructions  **\n\nAnalyze up to 100 projects provided in the input (JSON array).\nIgnore projects with \"done\" or \"rejected\" status.\nPrioritize projects with up to 5 proposals and up to 10 interested parties.\nPrioritize low or medium complexity.\nPenalize projects with vague scope, too many integrations, unrealistic deadlines, \"I need everything\" without assets, or a budget too low for the effort.\n* Use only the data  provided for your analysis and Use the same project ID for later identification. Do not make up information. *\nAlways respond in Portuguese (pt-BR).\nOutput: JSON only (UTF-8), no additional text.\nEvaluation criteria (score 0–5 internally and select the 5 with the highest sum)\n\nSkills compliance: n8n/simple automation; Python scripts; JS/PHP tweaks; WordPress/simple websites; basic data tasks.\nSimplicity: clear scope, few features, minimal integrations.\nSpeed: possible in 5–10 days.\nLeverage: reusability (templates/scripts) and portfolio value.\nBudget: fair for 1–2 weeks of work, considering the \"budget\" field.\nClient clarity: objective requirements, realistic tone, plausible deadlines.\n\n** Complexity rules **\n\nLow: one integration or one script; simple website tweaks; form automation; CSV/Excel cleanup; API → Google Sheets via n8n; chatbot FAQ with provided content.\nMedium: two integrations; small endpoints; WordPress theme/plugin tweaks; data ingestion + simple charts; ETL scheduled in n8n.\nExclude: full-featured mobile apps, complex SaaS, multi-tenant, advanced ML, deep backends, major redesigns, full-featured e-commerce.\n\n** Price heuristics (BRL) for reference **\n\nLow: 80–300\nMedium: 300–900\nMentally adjust for urgency, language, and scope. If the budget is incompatible, flag it under \"risks.\" \n\nExpected input (JSON array):\n[\n{\n\"id\": \"string\",\n\"title\": \"string\",\n\"published_at\": \"DD-MM-YYYY\",\n\"description\": \"string\",\n\"budget\": \"number|string\",\n\"category\": \"string\",\n\"subcategory\": \"string\",\n\"skills\": [\"string\", \"...\"],\n\"scope\": \"string\",\n\"delivery_date\": \"DD-MM-YYYY|string\",\n\"user_name\": \"string\",\n\"user_link\": \"string\",\n\"user_projects_published\": number,\n\"user_projects_paid\": number,\n\"user_member_since\": \"string\",\n\"proposals\": number,\n\"interested\": number,\n\"project_link\": \"string\",\n\"proposal_link\": \"string\",\n\"question_link\": \"string\",\n\"status\": \"open|done|rejected|...\"\n}\n]\n\nAbout me:\n{{ $('Set Variable').item.json.aboutMe }}\n\n** Output Format ** \n\nReturn only the following JSON format (no additional text):\n\n{\n   \"best_projects\":[\n      {\n         \"id\":\"string\",\n         \"title\":\"string\",\n         \"description\":\"string\",\n         \"complexity\":\"string\",\n         \"your_analyze\":\"string\",\n         \"why_fit\":[\n            \"bullet 1\",\n            \"bullet 2\"\n         ],\n         \"scope_outline\":[\n            \"bullet 1\",\n            \"bullet 2\",\n            \"bullet 3\"\n         ],\n         \"delivery_time_estimate\":\"string\",\n         \"price_range\":\"string\",\n         \"risks\":[\n            \"bullet 1\"\n         ],\n         \"recommendations\":[\n            \"bullet 1\",\n            \"bullet 2\",\n            \"bullet 3\"\n         ],\n         \"meta\":{\n            \"project_link\":\"string\",\n            \"budget_input\":\"raw budget from input\",\n            \"proposals\":\"number\",\n            \"interested\":\"number\",\n            \"posted_days_ago\":\"number\"\n         }\n      }\n   ]\n}\n\n** Additional selection rules **\n\nIf there are fewer than 5 eligible projects, return only the qualified ones.\nNormalize complexity to \"low\" or \"medium\" according to complexity rules.\nFill in posted_days_ago by calculating from published_at when possible; if missing, omit the field.\nIn recommendations, include actionable steps and concrete tools (e.g., n8n nodes, Python libraries, WP plugins).\nIn risks, flag possible access/asset dependencies (e.g., credentials, copy, API docs) and budget misalignment. \n\nMinimal output example:\n{\n\"best_projects\": [\n{\n\"id\": \"123\",\n\"title\": \"Integração de formulário → Planilhas Google (n8n)\",\n\"description\": \"Colete leads do site e envie para o Planilhas diariamente.\",\n\"complexity\": \"low\",\n\"your_analyze\": \"Este projeto é altamente viável devido à simplicidade do n8n e à integração direta com o Google Sheets. A automação proposta não apenas economiza tempo, mas também minimiza erros humanos ao coletar e organizar dados. Com um orçamento acessível e um cronograma de entrega rápido, ele se encaixa bem nas necessidades de pequenas empresas que buscam otimizar seus processos de captura de leads.\",\n\"why_fit\": [\n\"Aderente à N8N e automação simples\",\n\"Entrega rápida com alto valor para o cliente\"\n],\n\"scope_outline\": [\n\"Configurar webhook no n8n\",\n\"Mapear campos e validar dados\",\n\"Agendar tarefa e registrar logs\"\n],\n\"delivery_time_estimate_days\": 3,\n\"price_range_brl\": \"R$150 – 300\",\n\"risks\": [\n\"É necessário acesso ao site e ao Google\"\n],\n\"recommendations\": [\n\"Usar gatilho HTTP n8n + Planilhas Google\",\n\"Adicionar novas tentativas e notificação por e-mail\",\n\"Documentar no arquivo README com capturas de tela\"\n],\n\"meta\": {\n\"project_link\": \"https://www.workana.com/.../123\",\n\"budget_input\": \"R$200\",\n\"proposals\": 2,\n\"interested\": 4,\n\"posted_days_ago\": 1\n}\n}\n]\n}\n\n \nInput Data:\n{{ JSON.stringify($json.projects ) }} "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -2080,
+        224
+      ],
+      "id": "2358ea78-8ae3-44ad-8f6d-6b3a6799884e",
+      "name": "Career Coach Agent"
+    },
+    {
+      "parameters": {
+        "content": "## 🤖 STEP 2: Freelancer Project Analyzer\n\nAgent that analyzes opportunities on freelance platforms: Workana\n\n## **Objective**\nAnalyze work projects and return a structured JSON file with the project that best fits the profile.\n\n## **How ​​it Works**\n\n### 1. **Data Input**:\nReceives information about projects, including ID, title, description, complexity, and status.\n\n### 2. **Selection Criteria**:\n- Ignore projects with \"done\" or \"rejected\" status.\n- Select only projects of low or medium complexity.\n- Prioritize projects with up to 5 proposals and 10 interested parties.\n\n### 3. **Analysis**:\nProvide an analysis highlighting the best 5 project's potential and how it can increase the chances of success.  \n\n### 4. **Output Format**:\nReturns a JSON file with the following fields: ID, title, description, complexity, and analysis.\n",
+        "height": 768,
+        "width": 420
+      },
+      "id": "02d4b65b-18e1-4b5e-898a-8e9eb3155863",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1648,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
+          "mode": "list",
+          "cachedResultName": "Jobs Workana",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "projects",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "id",
+              "lookupValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1088,
+        544
+      ],
+      "id": "35a04b98-2883-4164-8cb8-a855ac77ff76",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
+          "mode": "list",
+          "cachedResultName": "Jobs Workana",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "projects",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "status": "in progess"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "project_link",
+              "displayName": "project_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "published_at",
+              "displayName": "published_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget",
+              "displayName": "budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subcategory",
+              "displayName": "subcategory",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "skills",
+              "displayName": "skills",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scope",
+              "displayName": "scope",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "prazo_entrega",
+              "displayName": "prazo_entrega",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "proposal_link",
+              "displayName": "proposal_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "question_link",
+              "displayName": "question_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_link",
+              "displayName": "user_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_projects_published",
+              "displayName": "user_projects_published",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_projects_paid",
+              "displayName": "user_projects_paid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "user_member_since",
+              "displayName": "user_member_since",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "proposals",
+              "displayName": "proposals",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "interested",
+              "displayName": "interested",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        544
+      ],
+      "id": "0a3392b2-bb3e-43a4-950d-57d94e4a4985",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
+          "mode": "list",
+          "cachedResultName": "Jobs Workana",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1879327603,
+          "mode": "list",
+          "cachedResultName": "analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio/edit#gid=1879327603"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "title": "={{ $json.title }}",
+            "description": "={{ $json.description }}",
+            "complexity": "={{ $json.complexity }}",
+            "analysis": "={{ $json.your_analyze }}",
+            "why_fit": "=- {{ $json.why_fit[0] }}\n- {{ $json.why_fit[1] }}",
+            "delivery_time_estimate": "={{ $json.delivery_time_estimate }}",
+            "scope_outline": "=- {{ $json.scope_outline[0] }}\n- {{ $json.scope_outline[1] }}\n- {{ $json.scope_outline[2] }}",
+            "price_range": "={{ $json.price_range }}",
+            "recommendations": "=- {{ $json.recommendations[0] }}\n- {{ $json.recommendations[1] }}\n- {{ $json.recommendations[2] }}",
+            "risks": "=- {{ $json.risks[0] }}\n- {{ $json.risks[1] }}",
+            "date": "={{ $now.toFormat(\"dd/MM/yyyy\") }}",
+            "status": "Prospecting/Lead Generation"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "complexity",
+              "displayName": "complexity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "analysis",
+              "displayName": "analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "why_fit",
+              "displayName": "why_fit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scope_outline",
+              "displayName": "scope_outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "delivery_time_estimate",
+              "displayName": "delivery_time_estimate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "price_range",
+              "displayName": "price_range",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "risks",
+              "displayName": "risks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "recommendations",
+              "displayName": "recommendations",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        912,
+        544
+      ],
+      "id": "e27908e5-4148-41bd-8d7e-a11f27f7b6f3",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c3a802d6-565b-4281-9190-5499b68dfd2f",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "todo",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "7fcd3280-2817-4572-91f7-e70461f1cfaf",
+              "leftValue": "={{ $json.published_at }}",
+              "rightValue": "={{ $now.toFormat('dd/MM/yyyy') }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        528
+      ],
+      "id": "0ca178e2-9a0d-4e94-a7c5-6706afb6261d",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "maxItems": 100
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        528
+      ],
+      "id": "e4ae525f-145b-431e-8c14-87f130f9ae69",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        688,
+        528
+      ],
+      "id": "aaa1fe33-d7ba-4f6c-8d4c-0c44b20e2ce0",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "let projects = [];\n\n// 1) Tenta ler como objeto JSON da entrada\ntry {\n  const output = $input.first()?.json?.output;\n\n  if (typeof output === \"string\" && output.trim().length > 0) {\n    const parsed = JSON.parse(output);\n    if (parsed.best_projects && Array.isArray(parsed.best_projects)) {\n      projects = parsed.best_projects.map(p => ({\n        id: String(p.id ?? \"\"),\n        title: String(p.title ?? \"\"),\n        description: String(p.description ?? \"\"),\n        complexity: String(p.complexity ?? \"\"),\n        your_analyze: String(p.your_analyze ?? \"\"),\n        why_fit: Array.isArray(p.why_fit) ? p.why_fit : [],\n        scope_outline: Array.isArray(p.scope_outline) ? p.scope_outline : [],\n        delivery_time_estimate: String(p.delivery_time_estimate ?? \"\"),\n        price_range: String(p.price_range ?? \"\"),\n        risks: Array.isArray(p.risks) ? p.risks : [],\n        recommendations: Array.isArray(p.recommendations) ? p.recommendations : [],\n        meta: {\n          project_link: String(p.meta?.project_link ?? \"\"),\n          budget_input: String(p.meta?.budget_input ?? \"\"),\n          proposals: Number(p.meta?.proposals ?? 0),\n          interested: Number(p.meta?.interested ?? 0),\n          posted_days_ago: Number(p.meta?.posted_days_ago ?? 0)\n        }\n      }));\n    }\n  }\n} catch (e) {\n  // ignore\n}\n\n// 2) Retornar apenas os objetos dos projetos\nconst result = [];\nfor (let i = 0; i < 5; i++) {\n  if (projects[i]) {\n    result.push(projects[i]);\n  } else {\n    result.push({\n      id: \"\",\n      title: \"\",\n      description: \"\",\n      complexity: \"\",\n      your_analyze: \"\",\n      why_fit: [],\n      scope_outline: [],\n      delivery_time_estimate: \"\",\n      price_range: \"\",\n      risks: [],\n      recommendations: [],\n      meta: {\n        project_link: \"\",\n        budget_input: \"\",\n        proposals: 0,\n        interested: 0,\n        posted_days_ago: 0\n      }\n    });\n  }\n}\n\n// Output\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        528
+      ],
+      "id": "39fbe514-fab0-4b61-ac44-7893dccfe867",
+      "name": "Code1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "GPT-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2112,
+        400
+      ],
+      "id": "41850ffe-cd41-4a37-96f5-773f95c9b06d",
+      "name": "GPT-5-mini Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "c7JjRgSwZclMpl7P",
+          "name": "Poe account (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você é um coach de carreira freelancer prestativo e inteligente. Utilize os dados e regras do System para selecionar e analisar os melhores projetos.\n\nSobre mim (aboutMe):\n{{ $('Set Variable').item.json.aboutMe || 'Não informado' }}\n\nInput Data (projects JSON):\n{{ JSON.stringify($json.projects || []) }}\n\nInstruções de processamento\n\nCarregue o array de projetos do bloco \"Input Data\".\nSe não houver projetos (array vazio ou ausente), retorne:\n{ \"best_projects\": [] }\n\nPara cada projeto, considere os possíveis campos:\nid, title, published_at, description, budget, category, subcategory, skills, scope, delivery_date, user_name, user_link, user_projects_published, user_projects_paid, user_member_since, proposals, interested,project_link, proposal_link, question_link, status.\n\nAplique os filtros e a pontuação; selecione até 5 com maior score.\nMonte a saída no schema exigido.\nGaranta que \"id\" em cada item seja exatamente o mesmo do input.\n\nNotas de segurança\n\nResponder somente JSON sem comentários.\nNão incluir exemplo ou texto explicativo.\nSem URLs externas além das recebidas no input.\nExemplo de retorno válido mínimo quando não há elegíveis\n{ \"best_projects\": [] }\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Você é um especialista em automação e desenvolvimento leve focado em ganhos rápidos (Pareto 80/20). Sua missão é selecionar e analisar projetos da Workana para um freelancer iniciante (formação em ADS, pós em Dados/IA, conhecimentos básicos em n8n, Python, JavaScript, PHP e websites). Priorize projetos de baixa a média complexidade, com escopo claro e entrega rápida, maximizando chances de 5 estrelas, primeiras conquistas e geração de caixa.\n\n** Regras gerais **\n\nAnalise até 100 projetos fornecidos no input (array JSON).\nUse apenas os dados fornecidos. Não invente informações.\nIgnore projetos com status \"done\", \"in progess\" e \"rejected\".\nPriorize projetos com até 5 propostas e até 10 interessados.\nPriorize complexidade baixa ou média (normalize para \"baixa\" ou \"média\").\nPenalize: escopo vago, integrações demais, prazos irreais, “preciso de tudo” sem assets, orçamento incompatível.\nSempre responda em Português (pt-BR).\nResponda SOMENTE JSON (UTF-8), sem qualquer texto adicional.\n\n** Critérios de avaliação (pontue internamente 0–5; selecione os 5 melhores no total): **\n\nAderência de habilidades: n8n/automação simples; scripts Python; ajustes JS/PHP; WordPress/websites simples; tarefas básicas de dados.\nSimplicidade: escopo claro, poucas features, poucas integrações.\nVelocidade: viável em 5–10 dias.\nAlavancagem: reutilização (templates/scripts) e valor de portfólio.\nOrçamento: coerente com esforço (campo \"budget\").\nClareza do cliente: requisitos objetivos, tom realista.\n\n** Regras de complexidade **\n\nBaixa: 1 integração ou 1 script; ajustes simples em site; automação de formulário; limpeza de CSV/Excel; API → Google Sheets (n8n); chatbot FAQ com conteúdo fornecido.\nMédia: 2 integrações; endpoints simples; ajustes de tema/plugin WP; ingestão + gráficos simples; ETL agendado em n8n.\nExcluir: app mobile completo; SaaS complexo; multi-tenant; ML avançado; backends profundos; redesign grande; e-commerce completo.\n\n** Heurísticas de preço (BRL) **\n\nBaixa: 80–300\nMédia: 300–900\nSe \"budget\" incompatível, sinalize em \"risks\".\n\n** Saída JSON (somente): **\n{\n\"best_projects\": [\n{\n\"id\": \"string (EXATAMENTE o id do input)\",\n\"title\": \"string\",\n\"description\": \"string\",\n\"complexity\": \"baixa\" | \"média\",\n\"your_analyze\":\"string\",\n\"why_fit\": [\"bullet\", \"bullet\"],\n\"scope_outline\": [\"bullet\", \"bullet\", \"bullet\"],\n\"delivery_time_estimate_days\": 3,\n\"price_range_brl\": \"R$150 – 300\",\n\"risks\": [\"bullet\"],\n\"recommendations\": [\"bullet\", \"bullet\", \"bullet\"],\n\"meta\": {\n\"project_link\": \"string|omit if missing\",\n\"budget_input\": \"string|number|omit if missing\",\n\"proposals\": \"number|omit if missing\",\n\"interested\": \"number|omit if missing\",\n\"posted_days_ago\": \"number|omit if missing\"\n}\n}\n]\n}\n\n** Validações e normalizações obrigatórias **\n\nSempre usar exatamente o \"id\" do projeto conforme fornecido. Não transformar, não reformatar, não gerar novo ID.\nSe qualquer campo de entrada estiver ausente, nulo ou vazio, não invente. Apenas omita no meta ou trate como “não informado” dentro da análise, sem criar valores.\nNormalizar complexidade: apenas \"baixa\" ou \"média\". Se o projeto parecer alto, exclua-o (não selecione).\nposted_days_ago: somente calcular se \"published_at\" existir e for data válida ISO (DD-MM-YYYY ou similar). Caso contrário, omitir.\nSe houver menos de 5 projetos elegíveis, retorne quantos forem qualificados (0–5).\nNão incluir campos extras fora do schema.\n\n** Heurística de filtro rápido **\n\nStatus aceitos: tudo diferente de \"done\", \"in progess\" e \"rejected\".\nPropostas ≤ 5 e Interessados ≤ 10 (se os campos existirem; se não existirem, não descarte por ausência).\nPreferir títulos e descrições claras; penalizar vagos.\nPreferir orçamentos coerentes; se ausente, não descartar, mas sinalizar risco.\n\n** Ferramentas recomendadas (para recommendations) **\n\nn8n: HTTP Trigger/Request, Google Sheets, Gmail/SMTP, Cron, Notion, Trello, Slack.\nPython: pandas, FastAPI, requests.\nWordPress: Contact Form 7/Elementor, functions.php tweaks, hooks.\nDados: Google Sheets + Looker Studio (KPI simples).\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        176,
+        528
+      ],
+      "id": "0c8014bf-d2bf-4af8-95c9-f6b4370787b9",
+      "name": "Career Coach Agent1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e980c92c-07d9-400e-b40c-a8fbdbe8bbcb",
+              "name": "aboutMe",
+              "type": "string",
+              "value": "Sou um freelancer em início de carreira, formado em Análise e Desenvolvimento de Sistemas e atualmente cursando pós-graduação em Análise de Dados e Inteligência Artificial. Tenho conhecimentos em n8n, Python, JavaScript e PHP, além de experiência na criação de websites. No momento, estou no segundo nível da Workana e almejo alcançar o nível 6 (HERO) por meio de propostas bem elaboradas e qualificações positivas, o que ampliará minhas oportunidades e benefícios.\n\nPara atingir meus objetivos, estou aplicando o Princípio de Pareto (Regra 80/20), priorizando projetos de baixa a média complexidade. Essa abordagem me permite gerar receita rapidamente, permitindo que eu invista mais tempo e recursos no aprimoramento das minhas habilidades e no fortalecimento do meu portfólio.\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2c2e402e-45f1-4651-bf02-17169bf7543d",
+      "name": "Set Variable",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -752,
+        528
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        752
+      ],
+      "id": "dd054887-74e0-4582-9691-c8af29db5157",
+      "name": "Think1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n   \"best_projects\":[\n      {\n         \"id\":\"string\",\n         \"title\":\"string\",\n         \"description\":\"string\",\n         \"complexity\":\"string\",\n         \"your_analyze\":\"string\",\n         \"why_fit\":[\n            \"bullet 1\",\n            \"bullet 2\"\n         ],\n         \"scope_outline\":[\n            \"bullet 1\",\n            \"bullet 2\",\n            \"bullet 3\"\n         ],\n         \"delivery_time_estimate\":\"string\",\n         \"price_range\":\"string\",\n         \"risks\":[\n            \"bullet 1\"\n         ],\n         \"recommendations\":[\n            \"bullet 1\",\n            \"bullet 2\",\n            \"bullet 3\"\n         ],\n         \"meta\":{\n            \"project_link\":\"string\",\n            \"budget_input\":\"raw budget from input\",\n            \"proposals\":\"number\",\n            \"interested\":\"number\",\n            \"posted_days_ago\":\"number\"\n         }\n      }\n   ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1840,
+        368
+      ],
+      "id": "d5fe707e-ce15-4dad-831f-bf78717d0f6b",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "Grok-4-Fast-Reasoning",
+          "mode": "list",
+          "cachedResultName": "Grok-4-Fast-Reasoning"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        752
+      ],
+      "id": "488c7f96-b87d-4e1b-8e74-183ebafc944e",
+      "name": "Grok Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "c7JjRgSwZclMpl7P",
+          "name": "Poe account (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Arquivado para consulta ",
+        "height": 416,
+        "width": 496,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2176,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "a480d4e5-53ef-42f8-ad00-ad057cca7124",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "started",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1152,
+        400
+      ],
+      "id": "6466eafc-9e4b-4037-b474-284f5c59c300",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "content": "## Como Funciona\n\nO workflow é acionado manualmente pra fins de testes e quando executado pelo fluxo de trabalho Workana AI Agent: Auto Update Jobs Workana Sheet.",
+        "height": 768,
+        "width": 384,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1200,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "87b9138b-b1bf-44e2-a789-6ec8afc9a252",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -976,
+        464
+      ],
+      "id": "ceb5929a-adf4-4e3b-8541-77ded7ae2784",
+      "name": "Wait",
+      "webhookId": "6dc43802-5d2c-4b60-be9a-55075c391f2d"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Career Coach Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Career Coach Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Career Coach Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-5-mini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Career Coach Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variable": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Career Coach Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grok Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Career Coach Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Career Coach Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Set Variable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Google Drive Trigger": {
+      "lastTimeChecked": "2025-10-11T19:40:11Z"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Career Coach Agent": [
+      {
+        "json": {
+          "output": "{\n  \"best_projects\": [\n    {\n      \"id\": \"27\",\n      \"title\": \"Configurar meu projeto pessoal desenvolvido em java 21 (springboot) mysql, e angular 20 no servidor da nuvem\",\n      \"description\": \"Hospedar aplicação Java 21 (Spring Boot) + Angular 20 em nuvem (AWS Lightsail recomendado), configurar domínio e ensinar o autor a gerenciar atualizações. Inclui consultoria prática (sessão remota). Prazo 10/10/2025.\",\n      \"complexity\": \"low\",\n      \"your_analyze\": \"Projeto de implantação/consultoria com escopo claro, entregue em ambiente cloud. Alinha bem ao seu perfil inicial (conhecimento web, Linux/servidor básico pode ser aprendido; envolve deploy, DNS e instrução ao cliente). Baixa concorrência (2 propostas) e orçamento compatível para 1–3 dias de trabalho + call.\",\n      \"why_fit\": [\n        \"Permite usar conhecimentos de web, deploy e scripts (Python/JS opcionais) e aprender AWS — bom para portfólio.\",\n        \"Escopo claro, poucas integrações, entrega rápida e alta chance de avaliação positiva.\"\n      ],\n      \"scope_outline\": [\n        \"Revisar repositório e instruções locais com o cliente.\",\n        \"Provisionar VPS (AWS Lightsail) e configurar ambiente (Java 21, Nginx/Reverse Proxy, Certbot SSL, MariaDB/MySQL).\",\n        \"Configurar build/CI básico (GitHub Actions) para deploy automático e mapear domínio/SSL.\",\n        \"Sessão remota (1–2 horas) para ensinar o cliente: deploy, atualizações e DNS.\",\n        \"Entregar README com comandos e checklist de rollback.\"\n      ],\n      \"delivery_time_estimate\": \"3–5 dias\",\n      \"price_range\": \"R$270 – 500\",\n      \"risks\": [\n        \"Acesso a repositório, credenciais da nuvem e domínio necessários; cliente precisa estar disponível para call.\",\n        \"Prazo rígido (10/10/2025) — confirmar disponibilidade imediata.\"\n      ],\n      \"recommendations\": [\n        \"Usar AWS Lightsail ou DigitalOcean droplet; instalar OpenJDK 21, Nginx, Certbot, e MySQL/MariaDB.\",\n        \"Criar workflow GitHub Actions para build do backend e deploy (rsync/docker), e pipeline simples para frontend (ng build) e upload.\",\n        \"Documentar passo a passo no README; gravar vídeo curto da sessão (para prova de entrega).\"\n      ],\n      \"meta\": {\n        \"project_link\": \"https://www.workana.com/job/configurar-meu-projeto-pessoal-desenvolvido-em-java-21-springboot-mysql-e-angular-20-no-servidor-da-nuvem?ref=projects_2\",\n        \"budget_input\": \"R$ 270 - 500\",\n        \"proposals\": 2,\n        \"interested\": 2,\n        \"posted_days_ago\": 2\n      }\n    },\n    {\n      \"id\": \"10\",\n      \"title\": \"Desenvolvimento De Sites Wordpress\",\n      \"description\": \"Criação de sites institucionais e one page para nova empresa de produção de sites. Escopo: instalação/configuração de pacote WordPress. Orçamento R$270–500.\",\n      \"complexity\": \"low\",\n      \"your_analyze\": \"Projeto típico para freelancer iniciante: sites institucionais / one-page com WordPress e Elementor/tema. Alta probabilidade de entrega rápida e avaliações positivas. Concorrência moderada (11 propostas) mas escopo direto e orçamento compatível com entregas rápidas.\",\n      \"why_fit\": [\n        \"Você tem experiência em criação de websites e PHP/WordPress básicos.\",\n        \"Projetos rápidos que aumentam portfólio e chance de avaliações positivas.\"\n      ],\n      \"scope_outline\": [\n        \"Receber briefing e exemplo visual do cliente.\",\n        \"Instalar WordPress, tema e plugins essenciais (SEO, segurança, cache).\",\n        \"Importar / ajustar layout one-page, responsividade e formulários de contato.\",\n        \"Configurar SEO básico, SSL e backup; entregar manual de uso.\"\n      ],\n      \"delivery_time_estimate\": \"3–7 dias\",\n      \"price_range\": \"R$270 – 500\",\n      \"risks\": [\n        \"Cliente pode pedir muitas personalizações sem aumentar orçamento; definir limites claros no escopo.\",\n        \"Acesso ao hosting e conteúdo (textos/imagens) é necessário.\"\n      ],\n      \"recommendations\": [\n        \"Usar tema leve (Astra/GeneratePress) + Elementor ou Gutenberg para acelerar desenvolvimento.\",\n        \"Instalar plugins: RankMath/Yoast, WP Rocket (ou LiteSpeed), UpdraftPlus; configurar formulários com Fluent Forms/Contact Form 7.\",\n        \"Enviar checklist de conteúdos necessários (logo, textos, imagens) no primeiro contato.\"\n      ],\n      \"meta\": {\n        \"project_link\": \"https://www.workana.com/job/desenvolvimento-de-sites-wordpress-31?ref=projects_1\",\n        \"budget_input\": \"R$ 270 - 500\",\n        \"proposals\": 11,\n        \"interested\": 18,\n        \"posted_days_ago\": 2\n      }\n    },\n    {\n      \"id\": \"31\",\n      \"title\": \"Desenvolvimento de Dashboard com taxa de recompra\",\n      \"description\": \"Criar dashboard atualizável mensalmente para calcular taxa de recompra (6 meses e 1 ano) usando histórico de vendas (~2 anos). Atualmente o cliente fazia no Power Query, mas precisa de solução estável.\",\n      \"complexity\": \"medium\",\n      \"your_analyze\": \"Boa oportunidade para aplicar conhecimentos de dados e Python/JS leves. Escopo bem definido (ETL + dashboard) e orçamento adequado para trabalho de 1–2 semanas. Alto valor para portfólio como projeto de análise de dados e dashboards atualizáveis.\",\n      \"why_fit\": [\n        \"Sua pós em Data/IA e conhecimento em Python encaixam bem para tratamento de dados e automação.\",\n        \"Permite entregar um produto reutilizável (pipeline + dashboard) para futuros clientes.\"\n      ],\n      \"scope_outline\": [\n        \"Receber amostra de dados e entender formato atual.\",\n        \"Criar pipeline de limpeza e transformação (Python/pandas ou n8n + Google Sheets).\",\n        \"Calcular métricas: taxa de recompra por período e janelas móveis (6m, 12m).\",\n        \"Desenvolver dashboard simples (Google Data Studio / Metabase / Power BI) com atualização mensal automatizada.\",\n        \"Documentar processo e rotina de atualização.\"\n      ],\n      \"delivery_time_estimate\": \"5–10 dias\",\n      \"price_range\": \"R$270 – 500\",\n      \"risks\": [\n        \"Qualidade/consistência dos dados de origem pode atrasar; cliente precisa fornecer amostra limpa ou explicar colunas.\",\n        \"Permissões de acesso aos dados/sistemas ou necessidade de integração com ERP podem aumentar escopo.\"\n      ],\n      \"recommendations\": [\n        \"Usar pandas para ETL e armazenar resultado em CSV/Google Sheets; opcionalmente agendar n8n para automatizar a ingestão.\",\n        \"Dashboard em Google Data Studio (conector Google Sheets) ou Metabase para implantação rápida e gratuita.\",\n        \"Entregar notebook Jupyter + README com instruções de execução e como atualizar mensalmente.\"\n      ],\n      \"meta\": {\n        \"project_link\": \"https://www.workana.com/job/desenvolvimento-de-dashboard-com-taxa-de-recompra?ref=projects_2\",\n        \"budget_input\": \"R$ 270 - 500\",\n        \"proposals\": 8,\n        \"interested\": 17,\n        \"posted_days_ago\": 2\n      }\n    },\n    {\n      \"id\": \"47\",\n      \"title\": \"Automação Ia para landpage N8n\",\n      \"description\": \"Realizar automações com n8n para uma landing page de vendas; respostas humanizadas com IA para empresa de climatização e refrigeração.\",\n      \"complexity\": \"low\",\n      \"your_analyze\": \"Projeto ideal para destacar habilidades em n8n e automação com IA. Escopo direto: conectar formulário/lead → n8n → IA (OpenAI) → e-mail/CRM/WhatsApp. Orçamento compatível e entrega rápida. Muitas empresas procuram esse tipo de solução; bom para case prático.\",\n      \"why_fit\": [\n        \"Você possui conhecimento em n8n e IA, exatamente o solicitado.\",\n        \"Alcance rápido de resultado, entrega em poucos dias e alto valor percebido pelo cliente.\"\n      ],\n      \"scope_outline\": [\n        \"Mapear gatilhos da landing page (formulário, webhook).\",\n        \"Criar workflow n8n: webhook → validação → chamada ao modelo (OpenAI/Anthropic) para resposta humanizada → enviar e-mail/notificação e salvar lead (Google Sheets/CRM).\",\n        \"Adicionar lógica de fallback e logs; configurar retry e notificações ao time.\",\n        \"Documentar e entregar workflow exportável.\"\n      ],\n      \"delivery_time_estimate\": \"2–5 dias\",\n      \"price_range\": \"R$500 – 1.300\",\n      \"risks\": [\n        \"Acesso ao form/landpage e chave de API (OpenAI) necessários; custos de uso da API devem ser combinados.\",\n        \"Expectativa do cliente por 'respostas perfeitas' sem conteúdo de treinamento pode requerer iterações.\"\n      ],\n      \"recommendations\": [\n        \"Usar n8n: gatilho HTTP Request (Webhook) → Function/Set nodes para normalizar → HTTP Request node para OpenAI (chat completions) → nodes para Google Sheets / e-mail / webhook para CRM.\",\n        \"Implementar rate-limit e retry, e incluir template de prompt com few-shot para respostas consistentes.\",\n        \"Entregar export do workflow e guia rápido de manutenção.\"\n      ],\n      \"meta\": {\n        \"project_link\": \"https://www.workana.com/job/automacao-ia-para-landpage-n8n?ref=projects_4\",\n        \"budget_input\": \"R$ 500 - 1.300\",\n        \"proposals\": 11,\n        \"interested\": 19,\n        \"posted_days_ago\": 2\n      }\n    },\n    {\n      \"id\": \"6\",\n      \"title\": \"Crawler\",\n      \"description\": \"Crawler jurídico em Python que não está logando; precisa corrigir o login para continuar buscas automatizadas. Prazo original 18/04/2025. Orçamento R$1.300–2.700.\",\n      \"complexity\": \"medium\",\n      \"your_analyze\": \"Tarefa técnica pontual em Python: ajustar crawler para nova estrutura de login. Encaixa bem com suas habilidades em Python e automação. Apesar de maior número de propostas (14), é um problema com escopo objetivo e com boa paga relativa — pode virar projeto recorrente se oferecer manutenção.\",\n      \"why_fit\": [\n        \"Alinha com conhecimento em Python e automação; alto valor técnico para portfólio.\",\n        \"Correção pontual com testes; entrega rápida possível se o cliente fornecer acesso e reproduzir o erro.\"\n      ],\n      \"scope_outline\": [\n        \"Receber código do crawler e acesso (credenciais de teste ou instruções para reproduzir).\",\n        \"Diagnosticar falha de login (changes de form, tokens, captcha, headers).\",\n        \"Implementar correção (requests/session, selenium headful se necessário, ou cookie reuse) e testar buscas.\",\n        \"Adicionar logs e instruções de execução; propor plano de manutenção preventiva.\"\n      ],\n      \"delivery_time_estimate\": \"3–7 dias\",\n      \"price_range\": \"R$1.300 – 2.700\",\n      \"risks\": [\n        \"Cliente precisa fornecer credenciais de teste e indicar se há proteção anti-bot (captcha) — isso pode aumentar complexidade.\",\n        \"Se site exigir interação complexa (2FA/captcha) pode escalar para solução com browser automático, mudando orçamento.\"\n      ],\n      \"recommendations\": [\n        \"Começar com análise dos headers e fluxo de autenticação usando requests + debug de rede; se necessário, usar Selenium em modo com navegador real (Chrome) mantendo sessão já logada.\",\n        \"Adicionar tratamento robusto de erros, retries exponenciais e logging detalhado (arquivo + stdout).\",\n        \"Oferecer contrato mensal de manutenção para adaptações futuras (retainer pequeno).\"\n      ],\n      \"meta\": {\n        \"project_link\": \"https://www.workana.com/job/crawler-21?ref=projects_1\",\n        \"budget_input\": \"R$ 1.300 - 2.700\",\n        \"proposals\": 14,\n        \"interested\": 19,\n        \"posted_days_ago\": 2\n      }\n    }\n  ]\n}"
+        }
+      }
+    ]
+  },
+  "versionId": "1901a532-aaf2-42f7-a14c-ebeac0279116",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
+    },
+    {
+      "createdAt": "2025-10-10T13:21:49.645Z",
+      "updatedAt": "2025-10-10T13:21:49.645Z",
+      "id": "dPPdsd8YcJkrO0u5",
+      "name": "sub"
+    },
+    {
+      "createdAt": "2025-10-07T18:10:03.762Z",
+      "updatedAt": "2025-10-07T18:10:03.762Z",
+      "id": "pBpikzqjo5Xglfoj",
+      "name": "internal-infra"
+    }
+  ],
+  "n8n_host_name ": "https://n8n.trymyapp.tech/"
+}
