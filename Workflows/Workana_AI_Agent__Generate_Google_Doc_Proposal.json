@@ -1,0 +1,341 @@
+{
+  "createdAt": "2025-09-21T11:56:11.282Z",
+  "updatedAt": "2025-10-12T17:11:40.823Z",
+  "id": "jekyvEetvz05SuWB",
+  "name": "Workana AI Agent: Generate Google Doc Proposal",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "cad45b62-6f37-4053-8b2f-0b07183b8331",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -176,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 📄 STEP 5: Google Doc Proposal Creation\n\nGenerates professional proposal documents:\n\n1. **OpenAI1**: Creates structured proposal content (title, explanation, scope, timeline)\n2. **Google Drive**: Copies template and creates unique document\n3. **Google Drive1**: Shares document publicly for client access\n4. **Google Docs**: Replaces template variables with AI-generated content\n5. **Edit Fields1**: Returns shareable URL to AI agent\n\n**Output**: Professional proposal document with personalized content and social proof",
+        "height": 396,
+        "width": 420
+      },
+      "id": "e9106532-e31d-48e8-9045-178aa6917d6d",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -672,
+        32
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e980c92c-07d9-400e-b40c-a8fbdbe8bbcb",
+              "name": "aboutMe",
+              "type": "string",
+              "value": "Sou um freelancer desenvolvedor Full Stack com IA e automação, apaixonado por transformar ideias em soluções digitais incríveis que cria sistemas de divulgação, sistemas de CRM, sistemas de gerenciamento de projetos, sistemas sem código e integrações. Com formação em Análise e Desenvolvimento de Sistemas, pós-graduando em Análise de Dados e Inteligência Artificial, dedico-me a criar projetos que aliam qualidade, inovação e impacto real. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "493f06b0-82a6-42bf-8954-22fe1b56deed",
+      "name": "Set Variable1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        64,
+        208
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "74b2ef09-da1d-4fe0-b6ea-242f25edf5e8",
+              "name": "urlOfProposal",
+              "type": "string",
+              "value": "=https://docs.google.com/document/d/{{ $json.documentId }}/edit"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "652211b1-b555-4a1d-8433-53d3830f1c4c",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1296,
+        208
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1TA8VE_Z10r82OBqR3w2SNQs77sNSjAuoHmoo9P6wlHg",
+          "mode": "list",
+          "cachedResultName": "Workana Proposal Template [pt]",
+          "cachedResultUrl": "https://docs.google.com/document/d/1TA8VE_Z10r82OBqR3w2SNQs77sNSjAuoHmoo9P6wlHg/edit?usp=drivesdk"
+        },
+        "name": "={{ $json.message.content.titleOfSystem }}",
+        "options": {}
+      },
+      "id": "db103947-bc6e-48b2-975f-1bdfe502bc8c",
+      "name": "Copy file",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        640,
+        208
+      ],
+      "typeVersion": 3,
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Svi2bbLgAmyehipR",
+          "name": "Google Drive Trigger (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.id }}"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "id": "2ed2aeab-9ab5-4e4d-adce-d37440c693ff",
+      "name": "Share file",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        864,
+        208
+      ],
+      "typeVersion": 3,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Svi2bbLgAmyehipR",
+          "name": "Google Drive Trigger (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $('Copy file').item.json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "{{titleOfSystem}}",
+              "replaceText": "={{ $('Message GPT-5-nano model').item.json.message.content.titleOfSystem }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{briefExplanationOfSystem}}",
+              "replaceText": "={{ $('Message GPT-5-nano model').item.json.message.content.briefExplanationOfSystem }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{specificPartOfTheirRequest}}",
+              "replaceText": "={{ $('Message GPT-5-nano model').item.json.message.content.specificPartOfTheirRequest }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{stepByStepBulletPoints}}",
+              "replaceText": "={{ $('Message GPT-5-nano model').item.json.message.content.stepByStepBulletPoints }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{leftToRightFlowWithArrows}}",
+              "replaceText": "={{ $('Message GPT-5-nano model').item.json.message.content.leftToRightFlowWithArrows }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{aboutMeBulletPoints}}",
+              "replaceText": "={{ $('Message GPT-5-nano model').item.json.message.content.aboutMeBulletPoints }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "{{proposalNumber}}",
+              "replaceText": "={{ $now.year }}.{{ $('Execute Workflow Trigger').item.json.projectId }}.{{ $now.day }}{{ $now.month }}"
+            }
+          ]
+        }
+      },
+      "id": "b843588f-6e6b-4f6a-8b87-c8538c98fcdf",
+      "name": "Update a document",
+      "type": "n8n-nodes-base.googleDocs",
+      "position": [
+        1088,
+        208
+      ],
+      "typeVersion": 2,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "nsu3cwKWu4EDuMmV",
+          "name": "Google Docs (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "GPT-5-nano",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a helpful, intelligent proposal writer.",
+              "role": "system"
+            },
+            {
+              "content": "=I'm an automation specialist applying to jobs on freelance platforms.\n\nYour task is to take as input an Workana job description and return as output JSON for a customized proposal (which I'll upload to Google Docs).\n\nHigh-performing proposals are typically templated as follows:\n\n```\n# {titleOfSystem} \n## {briefExplanationOfSystem}\n\nHi. As mentioned, I’m so confident I’m the right fit for this I went ahead and created a proposal for you, including a step-by-step of how I’d do it.\n\nI’ve done the below many times and working with {specificPartOfTheirRequest} is actually one of my favorite things to do. Talk about serendipity!\n\nAnyway, here’s how we'll build {paraphrasedSystem}:\n{stepByStepBulletPoints}\n\nSo basically, {leftToRightFlowWithArrows}.\n\nA little about me:\n{aboutMeBulletPoints}\n\nTo be upfront: my goal is to work with you on a long-term retainer, since I find it aligns incentives and lets me help clients better. So I'd treat everything we do together as foundational, and help you build systems that drive revenue/maximize cost savings. \n\nI am really confident I can blow this out of the park for you, so if this sounds like something you're into, just respond to my proposal on Upwork & we'll take it from there. \n\nThank you for your time!\n```\n\nOutput your results in JSON using this format:\n\n{\n  \"proposalNumber\": \"\",\n  \"titleOfSystem\": \"\",\n  \"briefExplanationOfSystem\": \"\",\n  \"specificPartOfTheirRequest\": \"\",\n  \"stepByStepBulletPoints\": \"\",\n  \"leftToRightFlowWithArrows\": \"\",\n  \"aboutMeBulletPoints\": \"\",\n}\n\nRules:\n- Always respond in Portuguese (pt-BR)\n- Write in a casual, spartan tone of voice.\n- Don't use emojis or flowery language.\n- If there's a name included somewhere in the description, add it for personalization purposes.\n- Return \"stepByStepBulletPoints\" and \"aboutMeBulletPoints\" as strings, and delimit each bullet point with a \\n and make sure it includes a -\n- In \"aboutMeBulletPoints\", prefer to mention social proof that includes $ and numbers.\n- For \"leftToRightFlowWithArrows\", write a simplified left to right flow delimited by \"->\" strings. For instance, we receive a new email -> we add that to the CRM -> we send an email to the new lead.\n- Use first-person \"I\" language, like \"I'd streamline...\" for bullet points etc.\n\n\nSome facts about me for the personalization: {{ $json.aboutMe }}\n"
+            },
+            {
+              "content": "={\"jobDescription\":\"{{ $('Execute Workflow Trigger').item.json.query }}\"}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "id": "74ee7463-1627-48ca-a199-17471e5e13ae",
+      "name": "Message GPT-5-nano model",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        256,
+        208
+      ],
+      "typeVersion": 1.6,
+      "credentials": {
+        "openAiApi": {
+          "id": "c7JjRgSwZclMpl7P",
+          "name": "Poe account (denisson.dev)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Set Variable1": {
+      "main": [
+        [
+          {
+            "node": "Message GPT-5-nano model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Variable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a document": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message GPT-5-nano model": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b6280a7e-6f14-4de7-b7e4-fdbd44cc3031",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
+    },
+    {
+      "createdAt": "2025-10-10T13:21:49.645Z",
+      "updatedAt": "2025-10-10T13:21:49.645Z",
+      "id": "dPPdsd8YcJkrO0u5",
+      "name": "sub"
+    },
+    {
+      "createdAt": "2025-10-07T18:10:03.762Z",
+      "updatedAt": "2025-10-07T18:10:03.762Z",
+      "id": "pBpikzqjo5Xglfoj",
+      "name": "internal-infra"
+    }
+  ],
+  "n8n_host_name ": "https://n8n.trymyapp.tech/"
+}
