@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-09-30T10:53:46.289Z",
-  "updatedAt": "2025-10-08T11:09:09.672Z",
+  "updatedAt": "2025-10-08T17:49:40.004Z",
   "id": "5LKEQcMctFiVdseu",
   "name": "IA Agent Gmail Manager (Sort Old Emails)",
   "active": true,
@@ -647,26 +647,20 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "362ad26f-b25a-47ba-9ad6-71ab58220aef",
+  "versionId": "5dfa6912-e1f3-4f34-980a-a38e41d638cb",
   "triggerCount": 1,
   "tags": [
-    {
-      "createdAt": "2025-08-19T13:07:09.692Z",
-      "updatedAt": "2025-08-19T13:07:09.692Z",
-      "id": "Vc1kY3YuqEvHdFNy",
-      "name": "Personal"
-    },
-    {
-      "createdAt": "2025-09-06T18:51:55.029Z",
-      "updatedAt": "2025-09-06T18:51:55.029Z",
-      "id": "aqoahvvuwcUF7xAJ",
-      "name": "Production"
-    },
     {
       "createdAt": "2025-10-07T18:10:03.762Z",
       "updatedAt": "2025-10-07T18:10:03.762Z",
       "id": "pBpikzqjo5Xglfoj",
       "name": "internal-infra"
+    },
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
     }
   ],
   "n8n_host_name ": "https://n8n.trymyapp.tech/"
