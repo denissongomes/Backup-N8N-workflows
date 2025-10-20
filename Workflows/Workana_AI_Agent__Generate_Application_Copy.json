@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-09-21T11:58:24.847Z",
-  "updatedAt": "2025-10-12T13:43:30.251Z",
+  "updatedAt": "2025-10-13T19:20:09.800Z",
   "id": "APTV78JPyznIjWGG",
   "name": "Workana AI Agent: Generate Application Copy",
   "active": false,
@@ -82,7 +82,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "GPT-5-nano",
+          "value": "GPT-5-mini",
           "mode": "id"
         },
         "messages": {
@@ -105,7 +105,7 @@
         }
       },
       "id": "705e82f9-4548-43f8-a994-f4cad4113c23",
-      "name": "Message GPT-5-nano model",
+      "name": "Message GPT-5 mini model",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "position": [
         304,
@@ -114,8 +114,8 @@
       "typeVersion": 1.6,
       "credentials": {
         "openAiApi": {
-          "id": "c7JjRgSwZclMpl7P",
-          "name": "Poe account (denisson.dev)"
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
         }
       }
     }
@@ -136,14 +136,14 @@
       "main": [
         [
           {
-            "node": "Message GPT-5-nano model",
+            "node": "Message GPT-5 mini model",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Message GPT-5-nano model": {
+    "Message GPT-5 mini model": {
       "main": [
         [
           {
@@ -161,7 +161,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "c1c8e16d-040f-42ac-b427-dd77273aa707",
+  "versionId": "3c61bbfd-5349-422a-99aa-3c7d08e24d0d",
   "triggerCount": 0,
   "tags": [
     {
