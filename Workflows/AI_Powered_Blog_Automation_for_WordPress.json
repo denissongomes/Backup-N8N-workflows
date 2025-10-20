@@ -1,0 +1,5092 @@
+{
+  "createdAt": "2025-10-15T13:42:57.578Z",
+  "updatedAt": "2025-10-18T13:58:47.099Z",
+  "id": "vSuIMHShzsW1No8Y",
+  "name": "AI-Powered Blog Automation for WordPress",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "rss",
+        "options": {}
+      },
+      "id": "b9d062e8-092a-480e-aef2-640ee945f039",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        -6400,
+        -3248
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 12
+            }
+          ]
+        }
+      },
+      "id": "e7b25e61-e236-427d-8acf-04cddecfaebb",
+      "name": "Get Articles Daily",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -6912,
+        -3248
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": "## Step 1. Save news in a vector store (runs daily)",
+        "height": 820,
+        "width": 2420,
+        "color": 3
+      },
+      "id": "5798c51a-dd2d-4362-80ba-650a27d46add",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6976,
+        -3408
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8c00469-890b-4b5b-8e2e-2ad9ec2d0815",
+              "name": "rss",
+              "type": "array",
+              "value": "=[\n  \"https://feeds.bbci.co.uk/news/technology/rss.xml\",\n  \"https://www.wired.com/feed/rss\",\n  \"https://www.technologyreview.com/topnews.rss\",\n  \"https://techcrunch.com/feed/\",\n\"https://www.marktechpost.com/feed/\",\n\"https://hackernoon.com/feed\",\n\"https://www.artificialintelligence-news.com/feed/\"\n]\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "34d2ee70-0036-4985-b3b6-f6a763901c8b",
+      "name": "Set Tech News RSS Feeds",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -6704,
+        -3248
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.rss }}",
+        "options": {
+          "ignoreSSL": false
+        }
+      },
+      "id": "372bd511-ff16-4107-a452-682d802385ec",
+      "name": "Read RSS News Feeds",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [
+        -6128,
+        -3248
+      ],
+      "typeVersion": 1.1,
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9f27ceb-c5f2-4997-8cb1-67576a7bb337",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "id": "4c4f9417-40f2-4fb0-9976-d09f5984680f",
+              "name": "content",
+              "type": "string",
+              "value": "={{ $json['content:encodedSnippet'] ?? $json.contentSnippet}}"
+            },
+            {
+              "id": "e1986bac-054e-4240-ba50-536dbcd27337",
+              "name": "date",
+              "type": "string",
+              "value": "={{ $json.isoDate}}"
+            },
+            {
+              "id": "9566e23c-ac30-4d66-abbd-889f322688b7",
+              "name": "link",
+              "type": "string",
+              "value": "={{ $json.link }}"
+            },
+            {
+              "id": "3429ba17-c0b9-426f-a224-80247c7079a1",
+              "name": "categories",
+              "value": "={{ $json.categories }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7e487cc0-dc3d-4e30-8a73-89ecb7ae4807",
+      "name": "Set and Normalize Fields",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -5456,
+        -3248
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "GPT-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "72b2782d-3a9c-4285-b8f5-6993b74831c3",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -5088,
+        -3056
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "=Title: {{ $json.title }}\nContent: {{ $json.content }}\nCategories: {{ $json.categories }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "=AI",
+              "description": "AI and Artificial Intelligence related articles "
+            }
+          ]
+        },
+        "options": {
+          "fallback": "discard"
+        }
+      },
+      "id": "44a9ef14-6114-4865-b0bc-4df551e5a3bd",
+      "name": "Text Classifier",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "position": [
+        -5040,
+        -3248
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Step 2: Relevance scoring\n\nConsider improving this by using\n- [serp api](https://serpapi.com/dashboard)\n- [jina ai](https://jina.ai/api-dashboard/reader)\n- [perplexity ai](https://www.perplexity.ai/)\n- [open ai web search](https://www.youtube.com/watch?v=eeuLRpvQ3DY)",
+        "height": 800,
+        "width": 1844,
+        "color": 5
+      },
+      "id": "b2347b53-4378-4c24-b6fa-4a95aa0b1cc8",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4496,
+        -3392
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here are 24 trending AI-related articles published today:\n\n {{ JSON.stringify($json.data) }}\n\nFrom this, generate:\n1. 10 unique long-tail blog title ideas based on these trends\n2. For each title, suggest:\n   - Main keyword\n   - Related keywords\n   - Suggested angle or tone (e.g. educational, provocative, analytical)\n3. Ensure each title is SEO-friendly, non-generic, and future-resilient\n4. Always respond in portuguese (pt-br)\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a content strategist for an AI-focused blog.\n"
+        }
+      },
+      "id": "c007d7a8-6cf1-4813-88ae-2019498d9522",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -4016,
+        -3200
+      ],
+      "retryOnFail": true,
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "GPT-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "1459f13f-c1a1-4e77-9dd4-41eb63923e23",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -4080,
+        -2928
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "8d05d52e-1c4a-4afb-b275-9927507c1853",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        -4272,
+        -3184
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n  \"title\": \"Why Code Review AI Like CriticGPT Might Replace Juniors\",\n  \"main_keyword\": \"AI code review\",\n  \"related_keywords\": [\"CriticGPT\", \"OpenAI\", \"developer tools\", \"LLM code agent\"],\n  \"tone\": \"analytical\",\n  \"link_articles\": [\"https://www.hatica.io/blog/future-of-code-reviews-2025-trends/\", \"https://graphite.dev/blog/ai-wont-replace-human-code-review\", \"https://medium.com/@ravibiswas0909/can-ai-replace-junior-developers-my-honest-take-861c7d430ce7\"],\n  \"date\": \"2025-06-16\"\n},{\n  \"title\": \"Huawei AI chips that power BYD and self driving cars in china\",\n  \"main_keyword\": \"AI chips\",\n  \"related_keywords\": [\"Huawei\", \"AI\", \"self driving cars\", \"BYD\"],\n  \"tone\": \"skeptical\",\n  \"link_articles\": [\"https://technode.com/2025/03/11/chinas-gac-to-sell-level-3-autonomous-driving-vehicles-with-huawei/\", \"https://www.reuters.com/business/autos-transportation/chinas-byd-use-huaweis-advanced-autonomous-driving-system-off-road-evs-2024-08-27/\", \"https://schen583.medium.com/huawei-intelligent-driving-solutions-overview-a-16-billion-valued-automotive-tier-1-f88f4bdfdff9\"],\n  \"date\": \"2025-06-16\"\n}\n]\n"
+      },
+      "id": "f1296076-c6a7-4910-afe3-505de58663d0",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -3776,
+        -2976
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dda47c0b-b0b2-46f0-a469-cd1b0e1b8152",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              },
+              "leftValue": "={{ $json.isoDate }}",
+              "rightValue": "={{ $now.minus(1,\"days\") }}"
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "0bb75d91-bd2e-41b0-ab44-3c3f632383d2",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        -5696,
+        -3248
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "content": "## Steps \n[Source](https://n8n.io/workflows/5230-content-farming-ai-powered-blog-automation-for-wordpress/)\n1. RSS Feed Ingestion (Daily Trigger)\n[x] Fetch latest articles from curated AI RSS feeds:\n[x] OpenAI, Meta AI, DeepMind, arXiv AI, HuggingFace, TechCrunch AI, VentureBeat AI, etc.\n[x] Deduplicate and store links + metadata (title, date, summary)\n\n2. Relevance Filtering\n[x] Filter for articles:\n[x] Published within last 24 hours\n[x] Containing key topics: model releases, tool updates, research, AI regulation, etc.\n[x] Score relevance using: Keyword match, Named entity recognition, Popularity heuristics (retweet count, domain authority, etc.)\n\n3. Content Summarization\n[x] Summarize 2–3 selected articles using extractive + abstractive methods\nExtract:\n[x] Key ideas\n[x] Notable names (models, companies, researchers)\n[x] Quotes or stats\n\n4. Long-Tail Angle Generation\nConvert short-tail news into long-tail evergreen angles: E.g. “OpenAI launches CriticGPT” → “Why AI Code Review Will Replace Junior Engineers”\nUse prompt chaining:\n[x] Step 1: extract the core topic\n[x] Step 2: generate 5 long-tail blog titles with intent match (e.g., 'how', 'why', 'what's next')\n[x] Step 3: score titles based on uniqueness + search intent\n\n5. SEO-Driven Outline Creation\nGenerate outline optimized for:\n[x] H1 + H2 structure\n[x] Natural keyword inclusion\n[x] Featured snippet targeting\n[x] Structure: Intro → Background → Trend → Insight → Forecast → CTA\n\n6. Full-Length Blog Drafting\n[x] Draft 1,000–1,500 word blog using outline\nInclude:\n[x] Citations from original articles\n[x] External links for trust\n[x] Analogies, examples, future implications\n[x] Maintain tone: informative, thought-leader, semi-technical\n\n7. SEO Enrichment\nGenerate:\n[x] Meta title (60 chars)\n[x] Meta description (160 chars)\n[x] Alt text for images\n[x] Slug URL with keyword\n[x] Auto-check for keyword density, passive voice, Flesch score\n\n8. Image Generation (Optional)\n[x] Create featured image using AI (e.g., DALL·E)\n\n9. Export & Publish\n[x] Export article in Markdown or HTML\n[x] Push to CMS (e.g., WordPress REST API)\n[x] publish immediately\n[ ] schedule\n\n10. Logging & Feedback Loop\n[x] Log:\n- Source articles\n- Generated title\n- Keywords used\n- Post URL\n- Store in database for:\n- Deduplication\n- Trend tracking\n- Traffic correlation\n[ ] Feedback loop:\n\n\n",
+        "height": 1360,
+        "width": 1020,
+        "color": 7
+      },
+      "id": "072462c4-d3d8-43e7-ad02-dbfb7f3e15cf",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -8064,
+        -3424
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Step 3: Research the news articles\n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/sticky-notes/)",
+        "height": 800,
+        "width": 2400,
+        "color": 4
+      },
+      "id": "688867aa-fb31-48ec-b2f5-8428ffd0b1b6",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6976,
+        -2512
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{ $json[\"link_articles\"] }}",
+        "options": {}
+      },
+      "id": "79b1f2d5-b6e2-4d3d-881d-f781136894ea",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -5936,
+        -2112
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "body",
+              "cssSelector": "body",
+              "skipSelectors": "img"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d8d87202-97b0-410c-bada-3b48204a5321",
+      "name": "HTML",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        -5760,
+        -2112
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "a1579f7f-12af-4212-b27a-b11ebfbdd13e",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -5376,
+        -1920
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Below is an article. Extract the 3 most important sentences that summarize the factual content. Do not interpret. Only copy exact sentences.\n\nUse that to extract and list:\n1. write a 2-paragraph summary of the article in your own words.\n2. Key concepts or ideas\n3. Names of companies, models, or researchers\n4. Any quoted statements or numerical/statistical claims\n5. Always respond in portuguese (pt-br)\n\nHere is the article:\n {{ $json.data }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "f4ceda8e-3046-4d15-9c5a-ad81cf7c1c2e",
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -5312,
+        -2112
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"abstract_summary\": \"...\",\n  \"ideas\": [\"...\"],\n  \"names\": [\"OpenAI\", \"CriticGPT\"],\n  \"quotes_or_stats\": [\"'70% faster than human review'\", \"CriticGPT released in June 2025\"]\n}\n"
+      },
+      "id": "42fed0e5-cc7c-42c3-8903-e3ec3f2e345c",
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -5104,
+        -1920
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "articles",
+        "options": {}
+      },
+      "id": "5d33296e-34f1-4e33-a5c4-b9f8aaf55d1b",
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        -5920,
+        -2320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a viral blog strategist. Given the following blog article concept: {{ JSON.stringify($json) }}\n\nImportant: Always respond in portuguese (pt-br)\n\nGenerate 5 compelling blog post titles that:\n- Evoke curiosity or urgency\n- Include emotional or controversial angles\n- Use long-tail keywords for SEO\n- Are clear, specific, and make the reader want to click\n- Follow formats like:\n  - “Why [X] Is About to Change Everything in [Y]”\n  - “The Hidden Truth About [Topic]”\n  - “How [Persona] Are Using [X] to [Y]”\n  - “What No One Tells You About [Topic]”\n  - “X Predictions About the Future of [Topic] That’ll Shock You”\n\nEnd your response with:  \n**Core Topic:** [a single phrase summarizing the article idea]\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "dc146d8d-872c-44c4-902c-16e222f648ae",
+      "name": "AI Agent2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -6512,
+        -1456
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "notes": "generate blog title ideas"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "0450d487-20b9-4545-8eb7-285045ed6bc2",
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -6496,
+        -1232
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"titles\": [\n    \"Why AI Code Review Will Replace Junior Engineers\",\n    \"How AI is Reshaping Software QA in 2025\",\n    \"What CriticGPT Means for Developer Workflows\",\n    \"The Future of Code Reviews: AI vs Human Engineers\",\n    \"5 Benefits of Using AI for Code Quality Control\"\n  ],\n  \"core_topic\" : \"AI software engineers\"\n}"
+      },
+      "id": "06452612-88ea-43f2-879c-a9d75e7b7c43",
+      "name": "Structured Output Parser2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -6384,
+        -1232
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "id": "335906a3-aa43-469d-b545-eee4d7fb0087",
+      "name": "Split Out2",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        -3664,
+        -3200
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "link_articles",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "db51f53d-a432-4213-a2c9-d71bf3488334",
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        -6560,
+        -2240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Step 4,5,6,7: Write the article and prepare SEO\n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/sticky-notes/)",
+        "height": 800,
+        "width": 3960,
+        "color": 6
+      },
+      "id": "512f391e-ac62-43c0-a7e9-12e5f94c21c6",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6976,
+        -1632
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Rate the following blog titles based on the **core topic**. Score each title out of 10 in:\n1. Uniqueness\n2. SEO keyword clarity\n3. Emotional and curiosity-driven clickbait quality\n\nTitles: {{ JSON.stringify($json.output.titles) }}\nCore Topic: {{ JSON.stringify($json.output.core_topic) }}\n\nReturn a ranked list with justifications for each score. Highlight the best one.\nImportant: Always respond in portuguese (pt-br)\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "41c3a62c-7a53-4a69-8bc0-7b3d4f9b4f98",
+      "name": "AI Agent3",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -6176,
+        -1456
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "notes": "rate blog title ideas"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "07dc7b99-27e8-474e-9b3e-05c0dfa38317",
+      "name": "OpenAI Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -6144,
+        -1232
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n    \"title\": \"Why AI Code Review Will Replace Junior Engineers\",\n    \"uniqueness_score\": 8,\n    \"seo_score\": 7,\n    \"longtail_score\": 9,\n    \"reason\": \"Strong intent signal ('why'), specific audience reference ('junior engineers'), but replacement framing may be oversimplified.\"\n  },\n  {\n    \"title\": \"How AI is Reshaping Software QA in 2025\",\n    \"uniqueness_score\": 6,\n    \"seo_score\": 9,\n    \"longtail_score\": 8,\n    \"reason\": \"Good long-tail and temporal relevance, but the 'reshaping' verb is generic and the angle lacks a unique hook.\"\n  },\n  {\n    \"title\": \"What CriticGPT Means for Developer Workflows\",\n    \"uniqueness_score\": 5,\n    \"seo_score\": 6,\n    \"longtail_score\": 6,\n    \"reason\": \"Moderately informative but lacks specificity, and may be too short-tail. Could benefit from clearer impact framing.\"\n  },\n  {\n    \"title\": \"The Future of Code Reviews: AI vs Human Engineers\",\n    \"uniqueness_score\": 7,\n    \"seo_score\": 8,\n    \"longtail_score\": 9,\n    \"reason\": \"Decent contrast-based framing. 'Future of' titles have strong SEO pull, but risk becoming overused.\"\n  },\n  {\n    \"title\": \"5 Benefits of Using AI for Code Quality Control\",\n    \"uniqueness_score\": 6,\n    \"seo_score\": 10,\n    \"longtail_score\": 8,\n    \"reason\": \"Clear list format, strong SEO structure, but uses a very common benefits-based formula with a broad target.\"\n  }\n]\n"
+      },
+      "id": "0176acd5-fdb5-41df-9221-d055a4d3a146",
+      "name": "Structured Output Parser3",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -6032,
+        -1232
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "jsCode": "let outline = $input.first().json.output[0].outline || '';\n\n// Step 1: Remove ```markdown and ``` fences\noutline = outline\n  .replace(/```markdown\\n?/g, '')   // remove opening ```markdown\n  .replace(/```/g, '')              // remove closing ```\n  .trim();\n\n// Step 2: Escape backslashes and double quotes\noutline = outline\n  .replace(/\\\\/g, '\\\\\\\\')           // escape backslashes\n  .replace(/\"/g, '\\\\\"');            // escape double quotes\n\nreturn {\n    _id : $('Code7').first().json._id,\n    blog_outline: outline,\n    completed_step : 5\n  }\n"
+      },
+      "id": "cc11df9e-f439-4cad-9613-d9c5ad72ebbd",
+      "name": "Code3",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -5040,
+        -1456
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "notes": "rank and choose the best one"
+    },
+    {
+      "parameters": {
+        "jsCode": "function escapeQuotes(str) {\n  if (typeof str !== 'string') return str;\n  return str.replace(/\"/g, \"'\");\n}\n\nconst articles = $input.first().json.articles.map(article => {\n  const sanitized = {};\n\n  // Loop through keys and escape problematic strings\n  for (const [key, value] of Object.entries(article)) {\n    if (Array.isArray(value)) {\n      sanitized[key] = value.map(v => escapeQuotes(v));\n    } else if (typeof value === 'string') {\n      sanitized[key] = escapeQuotes(value);\n    } else {\n      sanitized[key] = value;\n    }\n  }\n\n  return sanitized;\n});\n\nconst item_id = $('Find documents').first().json._id\n\nreturn {\n    _id: item_id,\n    articles: articles,\n    completed_step: 3\n  }\n"
+      },
+      "id": "83873774-f286-4bd0-be4f-ce73126b914d",
+      "name": "Code4",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -5744,
+        -2320
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an SEO blog strategist.\n\nGiven:\n- Title: {{ $('Update documents1').item.json.blog_title }}\n- Main keyword: {{ $('Find documents1').item.json.main_keyword }}\n- Related keywords: {{ JSON.stringify($('Find documents1').item.json.related_keywords) }}\n- Related articles: {{ JSON.stringify($('Find documents1').item.json.articles) }}\n\nGenerate a detailed outline for a blog post that:\n- Uses a strong **H1** as the main title\n- Includes **H2 subheadings** for each major section\n- Naturally incorporates the main keyword and related keywords\n- Follows this structure:\n  1. Intro\n  2. Background\n  3. Trend\n  4. Insight\n  5. Forecast\n  6. CTA\n- Is optimized for **featured snippet** inclusion on Google\n\nImportant: Always respond in portuguese (pt-br)\n\nRespond in Markdown format. Include H1 and H2 tags.\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "4e392dbb-b7a0-4ef5-9712-281fe8ed23f4",
+      "name": "AI Agent5",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -5312,
+        -1456
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "notes": "generate blog outline markdown"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "80e59585-8fb3-4f02-913f-c1cbb0c9846d",
+      "name": "OpenAI Chat Model6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -5312,
+        -1232
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('AI Agent3').first().json.output;\n\n// Add average_score to each item\nfor (const item of input) {\n  item.average_score = (\n    (item.uniqueness_score || 0) +\n    (item.seo_score || 0) +\n    (item.longtail_score || 0)\n  ) / 3;\n}\n\n// Sort by average_score descending\ninput.sort((a, b) => b.average_score - a.average_score);\n\n// Return full sorted list + top blog title\nreturn {\n    blog_title_ideas: input,\n    blog_title: input[0].title,\n    core_topic: $('AI Agent2').first().json.output.core_topic , \n    _id: $('Find documents1').first().json._id,\n    completed_step : 4\n  }\n"
+      },
+      "id": "a8334e97-16a4-4ddb-9874-70c46ac00981",
+      "name": "Code7",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -5824,
+        -1456
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "notes": "rank and choose the best one"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Use this information:\n\n- **Title**: {{ $('Update documents1').item.json.blog_title }}\n- **Main Keyword**: {{ $('Find documents1').item.json.main_keyword }}\n- **Related Keywords**: {{ JSON.stringify($('Find documents1').item.json.related_keywords) }}\n- **Tone**: {{ $('Find documents1').item.json.tone }}\n- **Outline**: {{ $('Code3').item.json.blog_outline }}\n- **Related Articles**: {{ JSON.stringify($('Find documents1').item.json.articles) }}\n- **Citations**: {{ JSON.stringify($('Find documents1').item.json.link_articles) }}\n\nInstructions:\n\n1. Write approximately 300 to 500 words per section outline\n2. Naturally include the main and related keywords.\n3. Incorporate:\n   - At least 2 **citations** (link to or mention source_articles)\n   - 1 analogy or example for clarity\n   - Future implications or forecasts\n4. Maintain the tone: {{ $('Find documents1').item.json.tone }}\n5. Write in Markdown format with:\n   - `#` for H1\n   - `##` for H2\n   - bullet points, bold text, or italics where needed\n6. Important: Always respond in portuguese (pt-br)\n\nRespond with the full blog article only.\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a professional blog writer for a leading AI publication.\n\nYour job is to write a complete, well-structured, SEO-friendly blog post."
+        }
+      },
+      "id": "86075a96-4a97-476b-9c35-d6c79772d6e9",
+      "name": "AI Agent6",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -4576,
+        -1456
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "notes": "create blog content"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "id": "a4d3403b-d104-4c06-8404-55178d4c8a3e",
+      "name": "OpenAI Chat Model7",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -4624,
+        -1264
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let blog_article = $('AI Agent6').first().json.output\nblog_article = blog_article\n  .replace(/```markdown\\n?/g, '')   // remove opening ```markdown\n  .replace(/```/g, '')              // remove closing ```\n  .trim();\n\n// Step 2: Escape backslashes and double quotes\nblog_article = blog_article\n  .replace(/\\\\/g, '\\\\\\\\')           // escape backslashes\n  .replace(/\"/g, '\\\\\"');        \n\nreturn {\n    _id : $('Code7').first().json._id,\n    blog_article: blog_article,\n    completed_step : 6\n  }\n"
+      },
+      "id": "41d83fe2-711b-4390-8450-2ee449b0e660",
+      "name": "Code5",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -4320,
+        -1456
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "alwaysOutputData": true,
+      "notes": "rank and choose the best one"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  ...$input.item.json,\n  completed_step: 2\n}"
+      },
+      "id": "c10ca6b2-eab3-41d1-a466-3f7f1b9d3e75",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -3440,
+        -3200
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Based on the blog article below, generate:\n1. A **meta title** (max 60 characters)\n2. A **meta description** (max 160 characters)\n3. An **image alt text** for the featured image\n4. A **URL slug** based on the blog title and keyword\n5. A basic SEO report:\n   - Keyword density for the main keyword\n   - Count of passive voice sentences\n   - Estimated Flesch reading score (0–100 scale)\n6. Important: Always respond in portuguese (pt-br)\n\nData:\n- Title:  {{ $('Update documents1').item.json.blog_title }}\n- Main Keyword: {{ $('Find documents1').item.json.main_keyword }}\n- Related Keywords: {{ JSON.stringify($('Find documents1').item.json.related_keywords) }}\n- Content: {{ $('Update documents5').item.json.blog_article }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an SEO expert."
+        }
+      },
+      "id": "899bb9f3-3b64-4c5a-bf8b-8f3175a8f47c",
+      "name": "AI Agent7",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -3856,
+        -1456
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "notes": "generate meta data"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "8ae865df-aa26-4db7-b58d-7f1021870da3",
+      "name": "OpenAI Chat Model8",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -3952,
+        -1232
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n    _id : $('Code7').first().json._id,\n    ...$input.first().json.output,\n    completed_step : 7\n  }\n"
+      },
+      "id": "348d1b7d-40a1-4c97-ab44-6e4b64d3d3d6",
+      "name": "Code6",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -3568,
+        -1456
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "notes": "rank and choose the best one"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"meta_title\": \"Why AI Code Review Tools Matter\",\n  \"meta_description\": \"Explore how AI is reshaping code reviews and what it means for developers.\",\n  \"image_alt_text\": \"AI reviewing code on a laptop screen\",\n  \"slug\": \"ai-code-review-tools\",\n  \"seo_report\": {\n    \"keyword_density\": \"2.8%\",\n    \"passive_voice_count\": 4,\n    \"flesch_score\": 62.5\n  }\n}"
+      },
+      "id": "cf88246e-e463-4279-b1b0-03856ad4cd7e",
+      "name": "Structured Output Parser4",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -3728,
+        -1248
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $('Find documents2').item.json.image_alt_text }}",
+        "options": {
+          "size": "1792x1024"
+        }
+      },
+      "id": "ee9700bc-d2f0-4c17-b5ca-6270d69c483f",
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        -6032,
+        -288
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "4Uam4TnnbH1SSDHH",
+          "name": "Poe account (moneysite)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Use the blog title, main keyword, and image alt text to craft a image generation prompt that captures a human-centered, emotionally compelling moment related to the image alt text.\n\nImagine a scene that tells a story or captures a pivotal feeling — something symbolic, cinematic, and relatable. Think in terms of real-world settings, natural environments, recognizable objects, or subtle interactions that represent change, tension, or hope. Let the visual convey meaning without relying on text or overt symbols.\n\nAvoid abstract visualizations like circuits, networks, floating data, or robotic aesthetics. Instead, evoke emotion and narrative through setting, lighting, perspective, and atmosphere. Let the image feel like a glimpse into a personal story, a lived moment, or a metaphor unfolding.\n\nDo not include any text or words in the image.\n\nRespond only with the image generation rompt.\n\nBlog Titile: {{ $json.blog_title }}\nMain Keyword: {{ $json.main_keyword }}\nImage Alt Text: {{ $json.image_alt_text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a creative visual expert in marketing and digital design. Your job is to craft emotionally compelling image prompts that generate click bait images for social media posts\n"
+        }
+      },
+      "id": "73fb4b41-3326-4952-9470-b7f108cf3278",
+      "name": "AI Agent4",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -6400,
+        -304
+      ],
+      "notesInFlow": true,
+      "typeVersion": 2,
+      "notes": "rate blog title ideas"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "c87da442-6f74-43e2-a87e-8faf907cfff7",
+      "name": "OpenAI Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -6448,
+        -144
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "4Uam4TnnbH1SSDHH",
+          "name": "Poe account (moneysite)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"prompt\": \"Create a visually striking digital banner for a blog article titled 'Exploring the Future of Generative Models Through Latent Space Interpolation.' The banner should feature a vibrant and abstract representation of a 'latent space,' showcasing smooth, flowing transitions between diverse data point visuals like images, sounds, and patterns. Incorporate elements symbolizing generative models such as neural networks, GANs, and VAEs. Use a color palette that blends futuristic blues, purples, and tech-inspired gradients\"\n}"
+      },
+      "id": "24a37ab6-35e2-4165-8980-d914ebbf92f2",
+      "name": "Structured Output Parser5",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -6240,
+        -144
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://blog.trymyapp.tech/wp-json/wp/v2/posts/{{ $('Create a post').item.json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "featured_media",
+              "value": "={{ $('Upload image2').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "663716bd-ccc4-4e58-9d5e-77494d042758",
+      "name": "Set Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -4352,
+        -672
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "wordpressApi": {
+          "id": "U9Udz9GCJTFjZuDD",
+          "name": "Wordpress (teste)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://blog.trymyapp.tech/wp-json/wp/v2/media",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Disposition",
+              "value": "=attachment; filename=\"img-{{ $('Find documents2').item.json.slug }}.jpg\""
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "e3b22ebe-49a5-43b1-8db7-3fa3b15f74b3",
+      "name": "Upload image2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -5264,
+        -672
+      ],
+      "retryOnFail": true,
+      "typeVersion": 4.2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "wordpressApi": {
+          "id": "U9Udz9GCJTFjZuDD",
+          "name": "Wordpress (teste)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://blog.trymyapp.tech/wp-json/wp/v2/posts/{{ $('Create a post').item.json.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wordpressApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"meta\":{\n    \"_yoast_wpseo_title\":\"{{ $('Find documents2').item.json.meta_title }}\",\n    \"_yoast_wpseo_metadesc\":\"{{ $('Find documents2').item.json.meta_description }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "435a1e95-28da-4aa0-a887-4bfaf32cdaa2",
+      "name": "Set metatag1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -4176,
+        -672
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "wordpressApi": {
+          "id": "U9Udz9GCJTFjZuDD",
+          "name": "Wordpress (teste)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return { \n  \"_id\" : $('Find documents2').first().json._id,\n  \"blog_image_url\": $input.first().json.source_url,\n  completed_step : 8\n};\n"
+      },
+      "id": "e2742fba-54b4-4385-abdf-7d6e42b5fd5a",
+      "name": "Code12",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -5072,
+        -672
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "postId": "={{ $('Create a post').item.json.id }}",
+        "updateFields": {
+          "status": "publish"
+        }
+      },
+      "id": "820084c9-43fa-4f2b-af7b-d6ff0cf22e7c",
+      "name": "Wordpress2",
+      "type": "n8n-nodes-base.wordpress",
+      "position": [
+        -3952,
+        -672
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "wordpressApi": {
+          "id": "U9Udz9GCJTFjZuDD",
+          "name": "Wordpress (teste)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return { \n  \"_id\" : $('Find documents2').first().json._id,\n  \"blog_status\": \"Published immediately\",\n  \"blog_link\" : $('Create a post').first().json.link, \n  completed_step : 9\n};\n"
+      },
+      "id": "21876fdf-4877-4b27-a6d5-d1e9ab531764",
+      "name": "Code14",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -3744,
+        -672
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const markdown = $('Find documents2').first().json.blog_article || '';\n\n// Simple replacements (limited Markdown support)\nlet html = markdown\n  .replace(/^### (.*$)/gim, '<h3>$1</h3>')\n  .replace(/^## (.*$)/gim, '<h2>$1</h2>')\n  .replace(/^# (.*$)/gim, '<h1>$1</h1>')\n  .replace(/\\*\\*(.*?)\\*\\*/gim, '<strong>$1</strong>')\n  .replace(/\\*(.*?)\\*/gim, '<em>$1</em>')\n  .replace(/\\[(.*?)\\]\\((.*?)\\)/gim, '<a href=\"$2\">$1</a>')\n  .replace(/\\n$/gim, '<br />');\n\nhtml = `<div>${html}</div>`; // wrap in container\n\nreturn [{\n  json: {\n    blog_html: html\n  }\n}];\n"
+      },
+      "id": "c51dc27a-423f-481f-9c2a-5ccd715b9579",
+      "name": "Code8",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -4720,
+        -672
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "url": "=https://cloud.leonardo.ai/api/rest/v1/generations/{{ $json.sdGenerationJob.generationId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7882ae8e-6304-464e-b663-4097f3ea414c",
+      "name": "HTTP Request2",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -6032,
+        -480
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2nYM4cRYMQsh8C3l",
+          "name": "Upload-Post API  (moneysite)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "id": "0d57b7c3-1332-4739-a2e5-e70def8ba986",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        -6208,
+        -480
+      ],
+      "webhookId": "c6eba895-fa7a-4113-88a0-8352816b4b98",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.imageUrl }}",
+        "options": {}
+      },
+      "id": "f5b91627-f3a0-4118-ad45-e152f1d2877c",
+      "name": "HTTP Request3",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -5536,
+        -672
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "content": "## Step 8,9: Generate image and create blog article",
+        "height": 800,
+        "width": 3880
+      },
+      "id": "222efbb1-b9fd-4a8a-a5c1-0b86cafa7cee",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6960,
+        -752
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2,
+              "triggerAtMinute": 20
+            }
+          ]
+        }
+      },
+      "id": "e2600b0e-bfcb-4789-b7cf-8bba59dcaf11",
+      "name": "Get Articles Daily1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -6880,
+        -672
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "4465dd3c-8e35-4d13-ba3e-62bc11446498",
+      "name": "Get Articles Daily2",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -6912,
+        -2240
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2,
+              "triggerAtMinute": 10
+            }
+          ]
+        }
+      },
+      "id": "d704e61b-ae61-46c6-bf54-4d0fc338f47e",
+      "name": "Get Articles Daily3",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -6880,
+        -1456
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n    \"outline\": \"```markdown\\n# Navigating Legal Complexities in AI and Copyright: A Complete Guide\\n\\n## Introduction: The Intersection of AI and Copyright\\nThe rise of generative AI has sparked a seismic shift in the creative landscape, leading to a plethora of AI copyright issues that challenge traditional views on intellectual property. As artists, musicians, and creators increasingly turn to AI-generated content, the question arises: who owns the rights to these creations? In this guide, we will explore the nuances of AI copyright issues, the implications for creativity rights, and what the future holds for artists harnessing the power of AI.\\n\\n## Background: Understanding AI and Copyright\\nIn order to grasp the complexities of AI copyright issues, one must first understand the fundamentals of copyright law and its application to generative AI. Copyright is designed to protect original works of authorship, but the emergence of AI-generated content complicates this traditional framework. This section will cover:\\n- Key definitions of intellectual property.\\n- The role of creativity rights in copyright law.\\n- Examples of how traditional copyright has been challenged by advancements in generative AI technologies.\\n\\n## Trend: The Rise of Generative AI and Its Impact\\nThe increasing sophistication of generative AI tools means more creators are using these technologies to produce art and music. This trend raises significant questions about originality and ownership. In this section, we will discuss:\\n- Notable applications of generative AI in various creative fields.\\n- The ongoing debate surrounding the legality and ethics of AI-generated content.\\n- Highlighting perspectives from industry experts, including insights from creators like Ed Sheeran on the nature of creativity in a world shaped by AI.\\n\\n## Insight: The Tension Between Innovation and Copyright Law\\nAs the lines blur between human creativity and machine-generated art, there is a growing tension between innovation and the protection of creativity rights. This section will delve into:\\n- Case studies showcasing the struggles artists face in asserting ownership over AI-assisted works.\\n- Quotations from thought leaders, such as Ed Sheeran’s view on the shared building blocks of creativity.\\n- Analyzing the statements of influential figures who have commented on the implications of AI on artistic expression, including references to past artistic movements.\\n\\n## Forecast: The Future of AI Copyright Issues\\nLooking ahead, the legal frameworks surrounding AI copyright issues are likely to evolve. This section will provide:\\n- Predictions on how copyright law may adapt to accommodate the realities of generative AI.\\n- Insights into potential policy changes and reforms that could arise from ongoing debates.\\n- A discussion on the importance of fostering a balanced approach that respects creativity rights while encouraging innovation.\\n\\n## Call to Action: Join the Conversation\\nAs the landscape of AI-generated content continues to evolve, the need for informed stakeholders is more critical than ever. We encourage readers to engage in this important dialogue. Share your thoughts on AI copyright issues and how you see the future of creativity rights developing. Stay updated with our latest insights and contribute to shaping the future of intellectual property in the age of AI.\\n```\\n\"\n  }\n]"
+      },
+      "id": "68fc84da-4fa3-4cd8-97a4-f6048d7c49e3",
+      "name": "Structured Output Parser6",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -5120,
+        -1232
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('Find documents2').first().json.image_alt_text || '';\nconst cleanBase = base.replace(/[\"\\n\\r]/g, ''); // Remove double quotes and line breaks\nconst enrichedPrompt = `A cinematic, emotionally compelling scene involving people that captures the essence of: ${cleanBase}. Include visible human figures in natural interaction or meaningful posture, placed in a symbolic setting that reinforces the story.`;\n\nreturn [{\n  json: {\n    prompt: enrichedPrompt\n  }\n}];\n"
+      },
+      "id": "8c583af4-0f88-4d5a-ba80-8fdbc0a4eb43",
+      "name": "Code9",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -6352,
+        -672
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "function stripHtmlTags(html) {\n  return html\n    .replace(/<\\/?[^>]+(>|$)/g, '') // remove all HTML tags\n    .replace(/&nbsp;/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>');\n}\n\nconst input = $json.body || \"\";\nconst markdownContent = stripHtmlTags(input).trim();\n\nreturn {\n  json: {\n    data: markdownContent\n  }\n};\n"
+      },
+      "id": "7b62bed7-e0ce-4dd0-9a50-2ef45f23375f",
+      "name": "Transform news to MD",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -5536,
+        -2112
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get current item data\nlet article = $json.output || {};\n\narticle.link = $('Code10').first().json.link_articles;\n\n// Return with flattened structure\nreturn {\n  json: {\n    ...article\n  }\n};\n"
+      },
+      "id": "2be7e5ce-2fc1-491f-9ac4-0485bfa92ed0",
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -4896,
+        -2112
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "3f9a1025-30a0-4c83-aff8-f6cd6955487e",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        -6352,
+        -2240
+      ],
+      "typeVersion": 3,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "id": "9e45987f-75a2-447c-864c-8c2c7ca9ed51",
+      "name": "Code10",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -6112,
+        -2112
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "={{ $json.blog }}",
+        "fields": "=title,main_keyword,related_keywords,tone,completed_step,link_articles",
+        "options": {
+          "dateFields": "date"
+        }
+      },
+      "id": "ada0d6b1-de9c-467d-9e6f-f234d8d5e42a",
+      "name": "Insert documents",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -3104,
+        -3200
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c86fe616-ec9c-4e5c-8b84-25adffd511e4",
+              "name": "blog",
+              "value": "blog-01",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3264,
+        -3200
+      ],
+      "id": "ca453ddb-c567-44cc-a076-14b551c8dec2",
+      "name": "Set Blog"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY",
+          "mode": "list",
+          "cachedResultName": "AI-Powered Blog Automation for WordPress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trending Articles",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.id.toString() }}",
+            "Date": "= {{ $now.toFormat('dd/MM/yyyy') }}",
+            "Blog": "={{ $('Set Blog').first().json.blog }}",
+            "Title": "={{ $json.title }}",
+            "Tone": "={{ $json.tone }}",
+            "Main Keyword": "={{ $json.related_keywords.toString() }}",
+            "Related Keywords": "={{ $json.related_keywords.toString() }}",
+            "Link Articles": "={{ $json.link_articles.toString() }}",
+            "Completed Step": "={{ $json.completed_step }}",
+            "Blog Status": "Relevance Filtering"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Blog",
+              "displayName": "Blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Completed Step",
+              "displayName": "Completed Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Main Keyword",
+              "displayName": "Main Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Related Keywords",
+              "displayName": "Related Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tone",
+              "displayName": "Tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Abstract Summary",
+              "displayName": "Abstract Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ideas",
+              "displayName": "Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Names",
+              "displayName": "Names",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quotes or Stats",
+              "displayName": "Quotes or Stats",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title",
+              "displayName": "Blog Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title Ideas",
+              "displayName": "Blog Title Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Core Topic",
+              "displayName": "Core Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Outline",
+              "displayName": "Blog Outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Article",
+              "displayName": "Blog Article",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Title",
+              "displayName": "Meta Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Description",
+              "displayName": "Meta Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image Alt Text",
+              "displayName": "Image Alt Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Slug",
+              "displayName": "Slug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SEO Report",
+              "displayName": "SEO Report",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Image Url",
+              "displayName": "Blog Image Url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link Articles",
+              "displayName": "Link Articles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Link",
+              "displayName": "Blog Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Status",
+              "displayName": "Blog Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2928,
+        -3200
+      ],
+      "id": "8836985c-ea8d-430a-a66c-58358cccfc59",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c86fe616-ec9c-4e5c-8b84-25adffd511e4",
+              "name": "blog",
+              "value": "blog-01",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6832,
+        -2400
+      ],
+      "id": "870d824c-fe89-4125-911f-e8626724ee9e",
+      "name": "Set Blog1"
+    },
+    {
+      "parameters": {
+        "collection": "={{ $json.blog }}",
+        "options": {
+          "limit": 1
+        },
+        "query": "{\"completed_step\":2}"
+      },
+      "id": "14f1b30e-a98e-4316-b9e5-41291e499119",
+      "name": "Find documents",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -6736,
+        -2240
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "={{ $('Set Blog1').item.json.blog }}",
+        "updateKey": "_id",
+        "fields": "articles, completed_step",
+        "options": {}
+      },
+      "id": "1298adb4-6461-4aba-bce5-1fff2c197504",
+      "name": "Update documents",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -5552,
+        -2320
+      ],
+      "typeVersion": 1.2,
+      "alwaysOutputData": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY",
+          "mode": "list",
+          "cachedResultName": "AI-Powered Blog Automation for WordPress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trending Articles",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Code4').item.json._id }}",
+            "Date": "={{ $now.toFormat('dd/MM/yyyy') }}",
+            "Blog": "={{ $('Set Blog1').item.json.blog }}",
+            "Title": "={{ $('Find documents').item.json.title }}",
+            "Tone": "={{ $('Find documents').item.json.tone }}",
+            "Main Keyword": "={{ $('Find documents').item.json.main_keyword }}",
+            "Related Keywords": "={{ $('Find documents').item.json.related_keywords.toString() }}",
+            "Completed Step": "={{ $json.completed_step }}",
+            "Abstract Summary": "={{ $json.articles[0].abstract_summary }}",
+            "Ideas": "={{ $json.articles[0].ideas.toString() }}",
+            "Names": "={{ $json.articles[0].names.toString() }}",
+            "Quotes or Stats": "={{ $json.articles[0].quotes_or_stats.toString() }}",
+            "Link Articles": "={{ $('Find documents').item.json.link_articles[0] }}",
+            "Blog Status": "Content Summarization"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Blog",
+              "displayName": "Blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Completed Step",
+              "displayName": "Completed Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Main Keyword",
+              "displayName": "Main Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Related Keywords",
+              "displayName": "Related Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tone",
+              "displayName": "Tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Abstract Summary",
+              "displayName": "Abstract Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ideas",
+              "displayName": "Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Names",
+              "displayName": "Names",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quotes or Stats",
+              "displayName": "Quotes or Stats",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title",
+              "displayName": "Blog Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title Ideas",
+              "displayName": "Blog Title Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Core Topic",
+              "displayName": "Core Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Outline",
+              "displayName": "Blog Outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Article",
+              "displayName": "Blog Article",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Title",
+              "displayName": "Meta Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Description",
+              "displayName": "Meta Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image Alt Text",
+              "displayName": "Image Alt Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Slug",
+              "displayName": "Slug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SEO Report",
+              "displayName": "SEO Report",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Image Url",
+              "displayName": "Blog Image Url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link Articles",
+              "displayName": "Link Articles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Link",
+              "displayName": "Blog Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Status",
+              "displayName": "Blog Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -5312,
+        -2320
+      ],
+      "id": "7ed63459-1df3-43e7-bbb6-cc6c3de1e016",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c86fe616-ec9c-4e5c-8b84-25adffd511e4",
+              "name": "blog",
+              "value": "blog-01",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6880,
+        -1264
+      ],
+      "id": "d1f38d7e-da75-4f77-870a-a111226b2fd4",
+      "name": "Set Blog2"
+    },
+    {
+      "parameters": {
+        "collection": "={{ $json.blog }}",
+        "options": {
+          "limit": 1
+        },
+        "query": "{\"completed_step\":3}"
+      },
+      "id": "6966c675-d54f-4518-8e81-1045bdff6185",
+      "name": "Find documents1",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -6704,
+        -1456
+      ],
+      "typeVersion": 1.2,
+      "alwaysOutputData": false,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "={{ $('Set Blog2').item.json.blog }}",
+        "updateKey": "_id",
+        "fields": "blog_title, blog_title_ideas, core_topic, completed_step",
+        "options": {}
+      },
+      "id": "74e5fcae-85b8-4bd5-a48d-68c9be2e8bb8",
+      "name": "Update documents1",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -5680,
+        -1456
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY",
+          "mode": "list",
+          "cachedResultName": "AI-Powered Blog Automation for WordPress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trending Articles",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Code7').item.json._id }}",
+            "Date": "={{ $now.toFormat('dd/MM/yyyy') }}",
+            "Blog": "={{ $('Set Blog2').item.json.blog }}",
+            "Title": "={{ $('Find documents1').item.json.title }}",
+            "Tone": "={{ $('Find documents1').item.json.tone }}",
+            "Main Keyword": "={{ $('Find documents1').first().json.main_keyword }}",
+            "Related Keywords": "={{ $('Find documents1').item.json.related_keywords.toString() }}",
+            "Completed Step": "={{ $json.completed_step }}",
+            "Abstract Summary": "={{ $('Find documents1').item.json.articles[0].abstract_summary }}",
+            "Ideas": "={{ $('Find documents1').item.json.articles[0].ideas.toString() }}",
+            "Names": "={{ $('Find documents1').item.json.articles[0].names.toString() }}",
+            "Quotes or Stats": "={{ $('Find documents1').item.json.articles[0].quotes_or_stats.toString() }}",
+            "Link Articles": "={{ $('Find documents1').item.json.link_articles[0] }}",
+            "Blog Title": "={{ $json.blog_title }}",
+            "Blog Title Ideas": "={{ $json.blog_title_ideas.map(idea => \n`- Title: ${idea.title} \n- Uniqueness Score: ${idea.uniqueness_score}\n- SEO Score: ${idea.seo_score} \n- Longtail Score: ${idea.longtail_score} \n- Reason: ${idea.reason} \n- Average Score: ${idea.average_score}\\n`\n).join('\\n') }}",
+            "Core Topic": "={{ $json.core_topic }}",
+            "Blog Status": "Long-Tail Angle Generation"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog",
+              "displayName": "Blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Completed Step",
+              "displayName": "Completed Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Main Keyword",
+              "displayName": "Main Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Related Keywords",
+              "displayName": "Related Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tone",
+              "displayName": "Tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Abstract Summary",
+              "displayName": "Abstract Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ideas",
+              "displayName": "Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Names",
+              "displayName": "Names",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quotes or Stats",
+              "displayName": "Quotes or Stats",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title",
+              "displayName": "Blog Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title Ideas",
+              "displayName": "Blog Title Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Core Topic",
+              "displayName": "Core Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Outline",
+              "displayName": "Blog Outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Article",
+              "displayName": "Blog Article",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Title",
+              "displayName": "Meta Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Description",
+              "displayName": "Meta Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image Alt Text",
+              "displayName": "Image Alt Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Slug",
+              "displayName": "Slug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SEO Report",
+              "displayName": "SEO Report",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Image Url",
+              "displayName": "Blog Image Url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link Articles",
+              "displayName": "Link Articles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Link",
+              "displayName": "Blog Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Status",
+              "displayName": "Blog Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -5488,
+        -1456
+      ],
+      "id": "e545e097-e7d1-4681-96b8-3cf037532758",
+      "name": "Append or update row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "={{ $('Set Blog2').item.json.blog }}",
+        "updateKey": "_id",
+        "fields": "blog_outline, completed_step",
+        "options": {}
+      },
+      "id": "ba7bd370-75e3-46f6-80a9-36e7a1bdeaed",
+      "name": "Update documents2",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -4880,
+        -1456
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY",
+          "mode": "list",
+          "cachedResultName": "AI-Powered Blog Automation for WordPress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trending Articles",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Code7').item.json._id }}",
+            "Date": "={{ $now.toFormat('dd/MM/yyyy') }}",
+            "Blog": "={{ $('Set Blog2').item.json.blog }}",
+            "Title": "={{ $('Find documents1').item.json.title }}",
+            "Tone": "={{ $('Find documents1').item.json.tone }}",
+            "Main Keyword": "={{ $('Find documents1').first().json.main_keyword }}",
+            "Related Keywords": "={{ $('Find documents1').item.json.related_keywords.toString() }}",
+            "Completed Step": "={{ $json.completed_step }}",
+            "Abstract Summary": "={{ $('Find documents1').item.json.articles[0].abstract_summary }}",
+            "Ideas": "={{ $('Find documents1').item.json.articles[0].ideas.toString() }}",
+            "Names": "={{ $('Find documents1').item.json.articles[0].names.toString() }}",
+            "Quotes or Stats": "={{ $('Find documents1').item.json.articles[0].quotes_or_stats.toString() }}",
+            "Link Articles": "={{ $('Find documents1').item.json.link_articles[0] }}",
+            "Blog Title": "={{ $('Find documents1').item.json.title }}",
+            "Blog Title Ideas": "={{ $('Append or update row in sheet2').item.json['Blog Title Ideas'] }}",
+            "Core Topic": "={{ $('Append or update row in sheet2').item.json['Core Topic'] }}",
+            "Blog Outline": "={{ $json.blog_outline }}",
+            "Blog Status": "SEO-Driven Outline Creation"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Blog",
+              "displayName": "Blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Completed Step",
+              "displayName": "Completed Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Main Keyword",
+              "displayName": "Main Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Related Keywords",
+              "displayName": "Related Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tone",
+              "displayName": "Tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Abstract Summary",
+              "displayName": "Abstract Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ideas",
+              "displayName": "Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Names",
+              "displayName": "Names",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quotes or Stats",
+              "displayName": "Quotes or Stats",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title",
+              "displayName": "Blog Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title Ideas",
+              "displayName": "Blog Title Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Core Topic",
+              "displayName": "Core Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Outline",
+              "displayName": "Blog Outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Article",
+              "displayName": "Blog Article",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Title",
+              "displayName": "Meta Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Description",
+              "displayName": "Meta Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image Alt Text",
+              "displayName": "Image Alt Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Slug",
+              "displayName": "Slug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SEO Report",
+              "displayName": "SEO Report",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Image Url",
+              "displayName": "Blog Image Url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link Articles",
+              "displayName": "Link Articles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Link",
+              "displayName": "Blog Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Status",
+              "displayName": "Blog Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -4736,
+        -1456
+      ],
+      "id": "67339ad7-77c1-4ccc-9597-214b3d3def51",
+      "name": "Append or update row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY",
+          "mode": "list",
+          "cachedResultName": "AI-Powered Blog Automation for WordPress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trending Articles",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Code7').item.json._id }}",
+            "Date": "={{ $now.toFormat('dd/MM/yyyy') }}",
+            "Blog": "={{ $('Set Blog2').item.json.blog }}",
+            "Title": "={{ $('Find documents1').item.json.title }}",
+            "Tone": "={{ $('Find documents1').item.json.tone }}",
+            "Main Keyword": "={{ $('Find documents1').first().json.main_keyword }}",
+            "Related Keywords": "={{ $('Find documents1').item.json.related_keywords.toString() }}",
+            "Completed Step": "={{ $json.completed_step }}",
+            "Abstract Summary": "={{ $('Find documents1').item.json.articles[0].abstract_summary }}",
+            "Ideas": "={{ $('Find documents1').item.json.articles[0].ideas.toString() }}",
+            "Names": "={{ $('Find documents1').item.json.articles[0].names.toString() }}",
+            "Quotes or Stats": "={{ $('Find documents1').item.json.articles[0].quotes_or_stats.toString() }}",
+            "Link Articles": "={{ $('Find documents1').item.json.link_articles[0] }}",
+            "Blog Title": "={{ $('Find documents1').item.json.title }}",
+            "Blog Title Ideas": "={{ $('Append or update row in sheet2').item.json['Blog Title Ideas'] }}",
+            "Core Topic": "={{ $('Append or update row in sheet2').item.json['Core Topic'] }}",
+            "Blog Outline": "={{ $('Append or update row in sheet3').item.json['Blog Outline'] }}",
+            "Blog Article": "={{ $json.blog_article }}",
+            "Blog Status": "Full-Length Blog Drafting"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Blog",
+              "displayName": "Blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Completed Step",
+              "displayName": "Completed Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Main Keyword",
+              "displayName": "Main Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Related Keywords",
+              "displayName": "Related Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tone",
+              "displayName": "Tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Abstract Summary",
+              "displayName": "Abstract Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ideas",
+              "displayName": "Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Names",
+              "displayName": "Names",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quotes or Stats",
+              "displayName": "Quotes or Stats",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title",
+              "displayName": "Blog Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title Ideas",
+              "displayName": "Blog Title Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Core Topic",
+              "displayName": "Core Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Outline",
+              "displayName": "Blog Outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Article",
+              "displayName": "Blog Article",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Title",
+              "displayName": "Meta Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Description",
+              "displayName": "Meta Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image Alt Text",
+              "displayName": "Image Alt Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Slug",
+              "displayName": "Slug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SEO Report",
+              "displayName": "SEO Report",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Image Url",
+              "displayName": "Blog Image Url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link Articles",
+              "displayName": "Link Articles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Link",
+              "displayName": "Blog Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Status",
+              "displayName": "Blog Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -4000,
+        -1456
+      ],
+      "id": "40dce9c8-915f-48b8-8e1a-8abf6f918bf9",
+      "name": "Append or update row in sheet4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY",
+          "mode": "list",
+          "cachedResultName": "AI-Powered Blog Automation for WordPress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trending Articles",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Code7').item.json._id }}",
+            "Date": "={{ $now.toFormat('dd/MM/yyyy') }}",
+            "Blog": "={{ $('Set Blog2').item.json.blog }}",
+            "Title": "={{ $('Find documents1').item.json.title }}",
+            "Tone": "={{ $('Find documents1').item.json.tone }}",
+            "Main Keyword": "={{ $('Find documents1').first().json.main_keyword }}",
+            "Related Keywords": "={{ $('Find documents1').item.json.related_keywords.toString() }}",
+            "Completed Step": "={{ $json.completed_step }}",
+            "Abstract Summary": "={{ $('Find documents1').item.json.articles[0].abstract_summary }}",
+            "Ideas": "={{ $('Find documents1').item.json.articles[0].ideas.toString() }}",
+            "Names": "={{ $('Find documents1').item.json.articles[0].names.toString() }}",
+            "Quotes or Stats": "={{ $('Find documents1').item.json.articles[0].quotes_or_stats.toString() }}",
+            "Link Articles": "={{ $('Find documents1').item.json.link_articles[0] }}",
+            "Blog Title": "={{ $('Find documents1').item.json.title }}",
+            "Blog Title Ideas": "={{ $('Append or update row in sheet2').item.json['Blog Title Ideas'] }}",
+            "Core Topic": "={{ $('Append or update row in sheet2').item.json['Core Topic'] }}",
+            "Blog Outline": "={{ $('Append or update row in sheet3').item.json['Blog Outline'] }}",
+            "Blog Article": "={{ $('Update documents5').item.json.blog_article }}",
+            "Meta Title": "={{ $json.meta_title }}",
+            "Meta Description": "={{ $json.meta_description }}",
+            "Image Alt Text": "={{ $json.image_alt_text }}",
+            "Slug": "={{ $json.slug }}",
+            "SEO Report": "=- Keyword Density: {{ $json.seo_report.keyword_density }}\n- Pasive Voice Count: {{ $json.seo_report.passive_voice_count }}\n- Flesh Score: {{ $json.seo_report.flesch_score }}",
+            "Blog Status": "SEO Enrichment"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Blog",
+              "displayName": "Blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Completed Step",
+              "displayName": "Completed Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Main Keyword",
+              "displayName": "Main Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Related Keywords",
+              "displayName": "Related Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tone",
+              "displayName": "Tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Abstract Summary",
+              "displayName": "Abstract Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ideas",
+              "displayName": "Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Names",
+              "displayName": "Names",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quotes or Stats",
+              "displayName": "Quotes or Stats",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title",
+              "displayName": "Blog Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title Ideas",
+              "displayName": "Blog Title Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Core Topic",
+              "displayName": "Core Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Outline",
+              "displayName": "Blog Outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Article",
+              "displayName": "Blog Article",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Title",
+              "displayName": "Meta Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Description",
+              "displayName": "Meta Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image Alt Text",
+              "displayName": "Image Alt Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Slug",
+              "displayName": "Slug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SEO Report",
+              "displayName": "SEO Report",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Image Url",
+              "displayName": "Blog Image Url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link Articles",
+              "displayName": "Link Articles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Link",
+              "displayName": "Blog Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Status",
+              "displayName": "Blog Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3248,
+        -1456
+      ],
+      "id": "4665fa8c-2f82-421c-b22d-56bd4a0c2e8b",
+      "name": "Append or update row in sheet5",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "={{ $('Set Blog2').item.json.blog }}",
+        "updateKey": "_id",
+        "fields": "=completed_step,meta_title,meta_description,image_alt_text, slug, seo_report",
+        "options": {}
+      },
+      "id": "244ebf4a-2ffe-4662-a78b-891fce12e2d7",
+      "name": "Update documents3",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -3408,
+        -1456
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c86fe616-ec9c-4e5c-8b84-25adffd511e4",
+              "name": "blog",
+              "value": "blog-01",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6704,
+        -672
+      ],
+      "id": "c02025e1-6032-4050-90d6-d373cfe81c5e",
+      "name": "Set Blog3"
+    },
+    {
+      "parameters": {
+        "collection": "={{ $json.blog }}",
+        "options": {
+          "limit": 1
+        },
+        "query": "{\"completed_step\":7}"
+      },
+      "id": "689a9d31-da7e-48ba-954e-32e2db07968c",
+      "name": "Find documents2",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -6512,
+        -672
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "Phoenix-1.0",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt }} --aspect 16:9 --style Dynamic\n\n\n "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -6112,
+        -672
+      ],
+      "id": "66958add-0606-42ae-b557-a57dcd098be3",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega o conteúdo retornado pelo modelo\nconst content = $json[\"message\"][\"content\"];\n\n// Regex para capturar qualquer URL que apareça no texto\nconst regex = /(https?:\\/\\/[^\\s)]+)/g;\nconst matches = content.match(regex);\n\n// Se encontrou alguma URL, processa\nif (matches && matches.length > 0) {\n  const url = matches[0];\n\n  // Pega a última parte da URL (o arquivo)\n  const filenameWithExt = url.split(\"/\").pop();\n\n  // Remove a extensão do arquivo (ex: .jpg, .png, .webp, etc.)\n  const filename = filenameWithExt.replace(/\\.[^/.]+$/, \"\");\n\n  return [\n    {\n      json: {\n        imageUrl: url,\n        fileName: filename,\n      },\n    },\n  ];\n} else {\n  // Caso nenhuma URL seja encontrada\n  return [\n    {\n      json: {\n        imageUrl: null,\n        fileName: null,\n      },\n    },\n  ];\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5760,
+        -672
+      ],
+      "id": "c294259e-5c6b-41d7-9370-ee8da1990811",
+      "name": "Get URL+name"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://cloud.leonardo.ai/api/rest/v1/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"modelId\": \"b2614463-296c-462a-9586-aafdb8f00e36\",\n  \"contrast\": 3.5,\n  \"prompt\": \"{{$json.prompt }}\",\n  \"num_images\": 1,\n  \"width\": 1472,\n  \"height\": 832,\n  \"styleUUID\": \"111dc692-d470-4eec-b791-3475abac4c46\",\n  \"enhancePrompt\": true\n}",
+        "options": {}
+      },
+      "id": "051791c0-daae-4525-ac1f-81eecc09e5e0",
+      "name": "HTTP Request (leonardo.ai)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -6400,
+        -480
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2nYM4cRYMQsh8C3l",
+          "name": "Upload-Post API  (moneysite)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "title": "teste wp",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [
+        -5008,
+        160
+      ],
+      "id": "dcbb1703-b857-4329-964b-35bd53013655",
+      "name": "Create a page",
+      "credentials": {
+        "wordpressApi": {
+          "id": "6ebm0LsACYSjX08z",
+          "name": "Wordpress (admin-teste)"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -5280,
+        176
+      ],
+      "id": "6a85dbba-04fb-4b41-a7cc-ae9f53deb341",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "={{ $('Set Blog3').item.json.blog }}",
+        "updateKey": "_id",
+        "fields": "=completed_step,blog_image_url",
+        "options": {}
+      },
+      "id": "f508a68a-375e-4d4b-a645-29540b12fbf0",
+      "name": "Update documents4",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -4896,
+        -672
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "title": "={{ $('Find documents2').first().json.blog_title }}",
+        "additionalFields": {
+          "authorId": 1,
+          "content": "={{ $json.blog_html }}",
+          "slug": "={{ $('Find documents2').first().json.slug }}",
+          "status": "draft",
+          "commentStatus": "closed",
+          "sticky": false,
+          "categories": [
+            1
+          ],
+          "postTemplate": {
+            "values": {}
+          }
+        }
+      },
+      "id": "7333265c-b8e6-4001-959b-ceeb9c6d54db",
+      "name": "Create a post",
+      "type": "n8n-nodes-base.wordpress",
+      "position": [
+        -4544,
+        -672
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "wordpressApi": {
+          "id": "U9Udz9GCJTFjZuDD",
+          "name": "Wordpress (teste)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY",
+          "mode": "list",
+          "cachedResultName": "AI-Powered Blog Automation for WordPress",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Trending Articles",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/17zYtsPkacMLYqXHLrXEuso4_1AgW6tfPSwlKvEoAavY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Find documents2').item.json._id }}",
+            "Date": "={{ $now.toFormat('dd/MM/yyyy') }}",
+            "Blog": "={{ $('Set Blog3').item.json.blog }}",
+            "Title": "={{ $('Find documents2').item.json.title }}",
+            "Tone": "={{ $('Find documents2').item.json.tone }}",
+            "Main Keyword": "={{ $('Find documents2').first().json.main_keyword }}",
+            "Related Keywords": "={{ $('Find documents2').item.json.related_keywords.toString() }}",
+            "Abstract Summary": "={{ $('Find documents2').item.json.articles[0].abstract_summary }}",
+            "Ideas": "={{ $('Find documents2').item.json.articles[0].ideas.toString() }}",
+            "Names": "={{ $('Find documents2').item.json.articles[0].names.toString() }}",
+            "Quotes or Stats": "={{ $('Find documents2').item.json.articles[0].quotes_or_stats.toString() }}",
+            "Link Articles": "={{ $('Find documents2').item.json.link_articles }}",
+            "Blog Title": "={{ $('Find documents2').item.json.title }}",
+            "Blog Title Ideas": "={{ $('Find documents2').item.json.articles[0].ideas }}",
+            "Core Topic": "={{ $('Find documents2').item.json.core_topic }}",
+            "Blog Outline": "={{ $('Find documents2').item.json.blog_outline }}",
+            "Blog Article": "={{ $('Find documents2').item.json.blog_article }}",
+            "Meta Title": "={{ $('Find documents2').item.json.meta_title }}",
+            "Meta Description": "={{ $('Find documents2').item.json.meta_description }}",
+            "Image Alt Text": "={{ $('Find documents2').item.json.image_alt_text }}",
+            "Slug": "={{ $('Find documents2').item.json.slug }}",
+            "SEO Report": "=- Keyword Density: {{ $('Find documents2').item.json.seo_report.keyword_density }}\n- Pasive Voice Count: {{ $('Find documents2').item.json.seo_report.passive_voice_count }}\n- Flesh Score: {{ $('Find documents2').item.json.seo_report.flesch_score }}\n",
+            "Completed Step": "={{ $json.completed_step }}",
+            "Blog Image Url": "={{ $('Update documents4').item.json.blog_image_url }}",
+            "Blog Link": "={{ $json.blog_link }}",
+            "Blog Status": "={{ $json.blog_status }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Blog",
+              "displayName": "Blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Completed Step",
+              "displayName": "Completed Step",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Main Keyword",
+              "displayName": "Main Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Related Keywords",
+              "displayName": "Related Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tone",
+              "displayName": "Tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Abstract Summary",
+              "displayName": "Abstract Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ideas",
+              "displayName": "Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Names",
+              "displayName": "Names",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quotes or Stats",
+              "displayName": "Quotes or Stats",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title",
+              "displayName": "Blog Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Title Ideas",
+              "displayName": "Blog Title Ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Core Topic",
+              "displayName": "Core Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Outline",
+              "displayName": "Blog Outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Article",
+              "displayName": "Blog Article",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Title",
+              "displayName": "Meta Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Meta Description",
+              "displayName": "Meta Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Image Alt Text",
+              "displayName": "Image Alt Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Slug",
+              "displayName": "Slug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SEO Report",
+              "displayName": "SEO Report",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Image Url",
+              "displayName": "Blog Image Url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link Articles",
+              "displayName": "Link Articles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Link",
+              "displayName": "Blog Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog Status",
+              "displayName": "Blog Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3376,
+        -672
+      ],
+      "id": "bfdda980-f590-4497-9d95-9fe1fa66dfb0",
+      "name": "Append or update row in sheet6",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "xsjzM7awSzgmW9h2",
+          "name": "Google Sheets (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "={{ $('Set Blog2').item.json.blog }}",
+        "updateKey": "_id",
+        "fields": "blog_article, completed_step",
+        "options": {}
+      },
+      "id": "eecd2565-7a3a-4087-91f2-696140beefdf",
+      "name": "Update documents5",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -4160,
+        -1456
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "={{ $('Set Blog3').item.json.blog }}",
+        "updateKey": "_id",
+        "fields": "completed_step, blog_status, blog_link",
+        "options": {}
+      },
+      "id": "0865d102-1eb3-4bdd-8059-15a2c07eafff",
+      "name": "Update documents6",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        -3552,
+        -672
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "mongoDb": {
+          "id": "fQJbzhFGitaJY7ek",
+          "name": "MongoDB (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "db22fa1e-fa66-4897-b2d6-03dda2de8852",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5920,
+        -3248
+      ],
+      "id": "f4330407-f9be-4955-a034-95b4fc01993e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.rss }}",
+        "options": {
+          "ignoreSSL": true
+        }
+      },
+      "id": "dcdb4729-23c1-4453-9cf2-3c3004fc0cca",
+      "name": "Read RSS News Feeds1",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [
+        -6048,
+        -3376
+      ],
+      "typeVersion": 1.1,
+      "alwaysOutputData": false
+    }
+  ],
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Read RSS News Feeds1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Articles Daily": {
+      "main": [
+        [
+          {
+            "node": "Set Tech News RSS Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Tech News RSS Feeds": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read RSS News Feeds": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set and Normalize Fields": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Set and Normalize Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Transform news to MD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Update documents2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Update documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent5": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code7": {
+      "main": [
+        [
+          {
+            "node": "Update documents1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent6": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent6",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Update documents5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Set Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent7": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent7",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Update documents3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent7",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser5": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Image": {
+      "main": [
+        [
+          {
+            "node": "Set metatag1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image2": {
+      "main": [
+        [
+          {
+            "node": "Code12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set metatag1": {
+      "main": [
+        [
+          {
+            "node": "Wordpress2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code12": {
+      "main": [
+        [
+          {
+            "node": "Update documents4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wordpress2": {
+      "main": [
+        [
+          {
+            "node": "Code14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code14": {
+      "main": [
+        [
+          {
+            "node": "Update documents6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code8": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Upload image2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Articles Daily1": {
+      "main": [
+        [
+          {
+            "node": "Set Blog3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Articles Daily2": {
+      "main": [
+        [
+          {
+            "node": "Set Blog1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Articles Daily3": {
+      "main": [
+        [
+          {
+            "node": "Set Blog2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser6": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code9": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform news to MD": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code10": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert documents": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Blog": {
+      "main": [
+        [
+          {
+            "node": "Insert documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Blog1": {
+      "main": [
+        [
+          {
+            "node": "Find documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find documents": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update documents": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Blog2": {
+      "main": [
+        [
+          {
+            "node": "Find documents1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find documents1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update documents1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update documents2": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet4": {
+      "main": [
+        [
+          {
+            "node": "AI Agent7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update documents3": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Blog3": {
+      "main": [
+        [
+          {
+            "node": "Find documents2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find documents2": {
+      "main": [
+        [
+          {
+            "node": "Code9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Get URL+name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get URL+name": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (leonardo.ai)": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Create a page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update documents4": {
+      "main": [
+        [
+          {
+            "node": "Code8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a post": {
+      "main": [
+        [
+          {
+            "node": "Set Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update documents5": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update documents6": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Read RSS News Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read RSS News Feeds1": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Get Articles Daily": {
+      "recurrenceRules": []
+    },
+    "node:Get Articles Daily1": {
+      "recurrenceRules": [
+        0
+      ]
+    },
+    "node:Get Articles Daily2": {
+      "recurrenceRules": [
+        0
+      ]
+    },
+    "node:Get Articles Daily3": {
+      "recurrenceRules": [
+        0
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1fe41c1f-97f7-4dc1-b2de-4441e39d0753",
+  "triggerCount": 4,
+  "tags": [
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
+    },
+    {
+      "createdAt": "2025-10-07T18:10:03.762Z",
+      "updatedAt": "2025-10-07T18:10:03.762Z",
+      "id": "pBpikzqjo5Xglfoj",
+      "name": "internal-infra"
+    }
+  ],
+  "n8n_host_name ": "https://n8n.trymyapp.tech/"
+}
