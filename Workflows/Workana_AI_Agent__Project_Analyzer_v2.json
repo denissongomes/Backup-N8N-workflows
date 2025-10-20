@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-10-09T11:26:25.490Z",
-  "updatedAt": "2025-10-12T13:42:18.898Z",
+  "updatedAt": "2025-10-13T19:19:11.002Z",
   "id": "laDvQh1s3f8r5lC6",
   "name": "Workana AI Agent: Project Analyzer-v2",
   "active": false,
@@ -692,7 +692,7 @@
         "text": "=Você é um coach de carreira freelancer prestativo e inteligente. Utilize os dados e regras do System para selecionar e analisar os melhores projetos.\n\nSobre mim (aboutMe):\n{{ $('Set Variable').item.json.aboutMe || 'Não informado' }}\n\nInput Data (projects JSON):\n{{ JSON.stringify($json.projects || []) }}\n\nInstruções de processamento\n\nCarregue o array de projetos do bloco \"Input Data\".\nSe não houver projetos (array vazio ou ausente), retorne:\n{ \"best_projects\": [] }\n\nPara cada projeto, considere os possíveis campos:\nid, title, published_at, description, budget, category, subcategory, skills, scope, delivery_date, user_name, user_link, user_projects_published, user_projects_paid, user_member_since, proposals, interested,project_link, proposal_link, question_link, status.\n\nAplique os filtros e a pontuação; selecione até 5 com maior score.\nMonte a saída no schema exigido.\nGaranta que \"id\" em cada item seja exatamente o mesmo do input.\n\nNotas de segurança\n\nResponder somente JSON sem comentários.\nNão incluir exemplo ou texto explicativo.\nSem URLs externas além das recebidas no input.\nExemplo de retorno válido mínimo quando não há elegíveis\n{ \"best_projects\": [] }\n",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "=Você é um especialista em automação e desenvolvimento leve focado em ganhos rápidos (Pareto 80/20). Sua missão é selecionar e analisar projetos da Workana para um freelancer iniciante (formação em ADS, pós em Dados/IA, conhecimentos básicos em n8n, Python, JavaScript, PHP e websites). Priorize projetos de baixa a média complexidade, com escopo claro e entrega rápida, maximizando chances de 5 estrelas, primeiras conquistas e geração de caixa.\n\n** Regras gerais **\n\nAnalise até 100 projetos fornecidos no input (array JSON).\nUse apenas os dados fornecidos. Não invente informações.\nIgnore projetos com status \"done\", \"in progess\" e \"rejected\".\nPriorize projetos com até 5 propostas e até 10 interessados.\nPriorize complexidade baixa ou média (normalize para \"baixa\" ou \"média\").\nPenalize: escopo vago, integrações demais, prazos irreais, “preciso de tudo” sem assets, orçamento incompatível.\nSempre responda em Português (pt-BR).\nResponda SOMENTE JSON (UTF-8), sem qualquer texto adicional.\n\n** Critérios de avaliação (pontue internamente 0–5; selecione os 5 melhores no total): **\n\nAderência de habilidades: n8n/automação simples; scripts Python; ajustes JS/PHP; WordPress/websites simples; tarefas básicas de dados.\nSimplicidade: escopo claro, poucas features, poucas integrações.\nVelocidade: viável em 5–10 dias.\nAlavancagem: reutilização (templates/scripts) e valor de portfólio.\nOrçamento: coerente com esforço (campo \"budget\").\nClareza do cliente: requisitos objetivos, tom realista.\n\n** Regras de complexidade **\n\nBaixa: 1 integração ou 1 script; ajustes simples em site; automação de formulário; limpeza de CSV/Excel; API → Google Sheets (n8n); chatbot FAQ com conteúdo fornecido.\nMédia: 2 integrações; endpoints simples; ajustes de tema/plugin WP; ingestão + gráficos simples; ETL agendado em n8n.\nExcluir: app mobile completo; SaaS complexo; multi-tenant; ML avançado; backends profundos; redesign grande; e-commerce completo.\n\n** Heurísticas de preço (BRL) **\n\nBaixa: 80–300\nMédia: 300–900\nSe \"budget\" incompatível, sinalize em \"risks\".\n\n** Saída JSON (somente): **\n{\n\"best_projects\": [\n{\n\"id\": \"string (EXATAMENTE o id do input)\",\n\"title\": \"string\",\n\"description\": \"string\",\n\"complexity\": \"baixa\" | \"média\",\n\"your_analyze\":\"string\",\n\"why_fit\": [\"bullet\", \"bullet\"],\n\"scope_outline\": [\"bullet\", \"bullet\", \"bullet\"],\n\"delivery_time_estimate_days\": 3,\n\"price_range_brl\": \"R$150 – 300\",\n\"risks\": [\"bullet\"],\n\"recommendations\": [\"bullet\", \"bullet\", \"bullet\"],\n\"meta\": {\n\"project_link\": \"string|omit if missing\",\n\"budget_input\": \"string|number|omit if missing\",\n\"proposals\": \"number|omit if missing\",\n\"interested\": \"number|omit if missing\",\n\"posted_days_ago\": \"number|omit if missing\"\n}\n}\n]\n}\n\n** Validações e normalizações obrigatórias **\n\nSempre usar exatamente o \"id\" do projeto conforme fornecido. Não transformar, não reformatar, não gerar novo ID.\nSe qualquer campo de entrada estiver ausente, nulo ou vazio, não invente. Apenas omita no meta ou trate como “não informado” dentro da análise, sem criar valores.\nNormalizar complexidade: apenas \"baixa\" ou \"média\". Se o projeto parecer alto, exclua-o (não selecione).\nposted_days_ago: somente calcular se \"published_at\" existir e for data válida ISO (DD-MM-YYYY ou similar). Caso contrário, omitir.\nSe houver menos de 5 projetos elegíveis, retorne quantos forem qualificados (0–5).\nNão incluir campos extras fora do schema.\n\n** Heurística de filtro rápido **\n\nStatus aceitos: tudo diferente de \"done\", \"in progess\" e \"rejected\".\nPropostas ≤ 5 e Interessados ≤ 10 (se os campos existirem; se não existirem, não descarte por ausência).\nPreferir títulos e descrições claras; penalizar vagos.\nPreferir orçamentos coerentes; se ausente, não descartar, mas sinalizar risco.\n\n** Ferramentas recomendadas (para recommendations) **\n\nn8n: HTTP Trigger/Request, Google Sheets, Gmail/SMTP, Cron, Notion, Trello, Slack.\nPython: pandas, FastAPI, requests.\nWordPress: Contact Form 7/Elementor, functions.php tweaks, hooks.\nDados: Google Sheets + Looker Studio (KPI simples).\n"
+          "systemMessage": "=Você é um especialista em automação e desenvolvimento leve focado em ganhos rápidos (Pareto 80/20). Sua missão é selecionar e analisar projetos da Workana para um freelancer iniciante (formação em ADS, pós em Dados/IA, conhecimentos básicos em n8n, Python, JavaScript, PHP sistemas web e websites). Priorize projetos de baixa a média complexidade, com escopo claro e entrega rápida, maximizando chances de 5 estrelas, primeiras conquistas e geração de caixa.\n\n** Regras gerais **\n\nAnalise até 100 projetos fornecidos no input (array JSON).\nUse apenas os dados fornecidos. Não invente informações.\nIgnore projetos com status \"done\", \"in progess\" e \"rejected\".\nPriorize projetos com até 5 propostas e até 10 interessados.\nPriorize complexidade baixa ou média (normalize para \"baixa\" ou \"média\").\nPenalize: escopo vago, integrações demais, prazos irreais, “preciso de tudo” sem assets, orçamento incompatível.\nSempre responda em Português (pt-BR).\nResponda SOMENTE JSON (UTF-8), sem qualquer texto adicional.\n\n** Critérios de avaliação (pontue internamente 0–5; selecione os 5 melhores no total): **\n\nAderência de habilidades: n8n/automação simples; scripts Python; ajustes JS/PHP; WordPress/websites simples; tarefas básicas de dados.\nSimplicidade: escopo claro, poucas features, poucas integrações.\nVelocidade: viável em 5–10 dias.\nAlavancagem: reutilização (templates/scripts) e valor de portfólio.\nOrçamento: coerente com esforço (campo \"budget\").\nClareza do cliente: requisitos objetivos, tom realista.\n\n** Regras de complexidade **\n\nBaixa: 1 integração ou 1 script; ajustes simples em site; automação de formulário; limpeza de CSV/Excel; API → Google Sheets (n8n); chatbot FAQ com conteúdo fornecido.\nMédia: 2 integrações; endpoints simples; ajustes de tema/plugin WP; ingestão + gráficos simples; ETL agendado em n8n.\nExcluir: app mobile completo; SaaS complexo; multi-tenant; ML avançado; backends profundos; redesign grande; e-commerce completo.\n\n** Heurísticas de preço (BRL) **\n\nBaixa: 80–300\nMédia: 300–900\nSe \"budget\" incompatível, sinalize em \"risks\".\n\n** Saída JSON (somente): **\n{\n\"best_projects\": [\n{\n\"id\": \"string (EXATAMENTE o id do input)\",\n\"title\": \"string\",\n\"description\": \"string\",\n\"complexity\": \"baixa\" | \"média\",\n\"your_analyze\":\"string\",\n\"why_fit\": [\"bullet\", \"bullet\"],\n\"scope_outline\": [\"bullet\", \"bullet\", \"bullet\"],\n\"delivery_time_estimate_days\": 3,\n\"price_range_brl\": \"R$150 – 300\",\n\"risks\": [\"bullet\"],\n\"recommendations\": [\"bullet\", \"bullet\", \"bullet\"],\n\"meta\": {\n\"project_link\": \"string|omit if missing\",\n\"budget_input\": \"string|number|omit if missing\",\n\"proposals\": \"number|omit if missing\",\n\"interested\": \"number|omit if missing\",\n\"posted_days_ago\": \"number|omit if missing\"\n}\n}\n]\n}\n\n** Validações e normalizações obrigatórias **\n\nSempre usar exatamente o \"id\" do projeto conforme fornecido. Não transformar, não reformatar, não gerar novo ID.\nSe qualquer campo de entrada estiver ausente, nulo ou vazio, não invente. Apenas omita no meta ou trate como “não informado” dentro da análise, sem criar valores.\nNormalizar complexidade: apenas \"baixa\" ou \"média\". Se o projeto parecer alto, exclua-o (não selecione).\nposted_days_ago: somente calcular se \"published_at\" existir e for data válida ISO (DD-MM-YYYY ou similar). Caso contrário, omitir.\nSe houver menos de 5 projetos elegíveis, retorne quantos forem qualificados (0–5).\nNão incluir campos extras fora do schema.\n\n** Heurística de filtro rápido **\n\nStatus aceitos: tudo diferente de \"done\", \"in progess\" e \"rejected\".\nPropostas ≤ 5 e Interessados ≤ 10 (se os campos existirem; se não existirem, não descarte por ausência).\nPreferir títulos e descrições claras; penalizar vagos.\nPreferir orçamentos coerentes; se ausente, não descartar, mas sinalizar risco.\n\n** Ferramentas recomendadas (para recommendations) **\n\nn8n: HTTP Trigger/Request, Google Sheets, Gmail/SMTP, Cron, Notion, Trello, Slack.\nPython: pandas, FastAPI, requests.\nWordPress: Contact Form 7/Elementor, functions.php tweaks, hooks.\nDados: Google Sheets + Looker Studio (KPI simples).\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -712,7 +712,7 @@
               "id": "e980c92c-07d9-400e-b40c-a8fbdbe8bbcb",
               "name": "aboutMe",
               "type": "string",
-              "value": "Sou um freelancer em início de carreira, formado em Análise e Desenvolvimento de Sistemas e atualmente cursando pós-graduação em Análise de Dados e Inteligência Artificial. Tenho conhecimentos em n8n, Python, JavaScript e PHP, além de experiência na criação de websites. No momento, estou no segundo nível da Workana e almejo alcançar o nível 6 (HERO) por meio de propostas bem elaboradas e qualificações positivas, o que ampliará minhas oportunidades e benefícios.\n\nPara atingir meus objetivos, estou aplicando o Princípio de Pareto (Regra 80/20), priorizando projetos de baixa a média complexidade. Essa abordagem me permite gerar receita rapidamente, permitindo que eu invista mais tempo e recursos no aprimoramento das minhas habilidades e no fortalecimento do meu portfólio.\n"
+              "value": "Sou um freelancer em início de carreira, formado em Análise e Desenvolvimento de Sistemas e atualmente cursando pós-graduação em Análise de Dados e Inteligência Artificial. Tenho conhecimentos em low-code/no-code, n8n, Vibe code, Python, JavaScript e PHP, com foco em desenvolvimento de sistemas web e automações. No momento, estou no segundo nível da Workana e almejo alcançar o nível 6 (HERO) por meio de propostas bem elaboradas e qualificações positivas, o que ampliará minhas oportunidades e benefícios.\n\nPara atingir meus objetivos, estou aplicando o Princípio de Pareto (Regra 80/20), priorizando projetos de baixa a média complexidade. Essa abordagem me permite gerar receita rapidamente, permitindo que eu invista mais tempo e recursos no aprimoramento das minhas habilidades e no fortalecimento do meu portfólio.\n"
             }
           ]
         },
@@ -750,31 +750,6 @@
       ],
       "id": "d5fe707e-ce15-4dad-831f-bf78717d0f6b",
       "name": "Structured Output Parser1"
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "value": "Grok-4-Fast-Reasoning",
-          "mode": "list",
-          "cachedResultName": "Grok-4-Fast-Reasoning"
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.2,
-      "position": [
-        128,
-        752
-      ],
-      "id": "488c7f96-b87d-4e1b-8e74-183ebafc944e",
-      "name": "Grok Chat Model",
-      "credentials": {
-        "openAiApi": {
-          "id": "c7JjRgSwZclMpl7P",
-          "name": "Poe account (denisson.dev)"
-        }
-      }
     },
     {
       "parameters": {
@@ -842,6 +817,31 @@
       "id": "ceb5929a-adf4-4e3b-8541-77ded7ae2784",
       "name": "Wait",
       "webhookId": "6dc43802-5d2c-4b60-be9a-55075c391f2d"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "GPT-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        752
+      ],
+      "id": "488c7f96-b87d-4e1b-8e74-183ebafc944e",
+      "name": "GPT-5 Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
     }
   ],
   "connections": {
@@ -1005,17 +1005,6 @@
         ]
       ]
     },
-    "Grok Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Career Coach Agent1",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Career Coach Agent1": {
       "main": [
         [
@@ -1048,6 +1037,17 @@
           }
         ]
       ]
+    },
+    "GPT-5 Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Career Coach Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1070,7 +1070,7 @@
       }
     ]
   },
-  "versionId": "1901a532-aaf2-42f7-a14c-ebeac0279116",
+  "versionId": "79f78d32-6ee6-4836-8642-2002e768d3a7",
   "triggerCount": 1,
   "tags": [
     {
