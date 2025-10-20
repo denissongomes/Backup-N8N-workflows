@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-09-21T11:56:11.282Z",
-  "updatedAt": "2025-10-12T17:11:40.823Z",
+  "updatedAt": "2025-10-13T19:20:34.585Z",
   "id": "jekyvEetvz05SuWB",
   "name": "Workana AI Agent: Generate Google Doc Proposal",
   "active": false,
@@ -89,6 +89,19 @@
           "cachedResultUrl": "https://docs.google.com/document/d/1TA8VE_Z10r82OBqR3w2SNQs77sNSjAuoHmoo9P6wlHg/edit?usp=drivesdk"
         },
         "name": "={{ $json.message.content.titleOfSystem }}",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1oNejL80Kl0THZJ5XBvVR5dvdmLHJseVu",
+          "mode": "list",
+          "cachedResultName": "Propostas Workana",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1oNejL80Kl0THZJ5XBvVR5dvdmLHJseVu"
+        },
         "options": {}
       },
       "id": "db103947-bc6e-48b2-975f-1bdfe502bc8c",
@@ -201,7 +214,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "GPT-5-nano",
+          "value": "GPT-5-mini",
           "mode": "id"
         },
         "messages": {
@@ -233,8 +246,8 @@
       "typeVersion": 1.6,
       "credentials": {
         "openAiApi": {
-          "id": "c7JjRgSwZclMpl7P",
-          "name": "Poe account (denisson.dev)"
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
         }
       }
     }
@@ -315,7 +328,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "b6280a7e-6f14-4de7-b7e4-fdbd44cc3031",
+  "versionId": "2b5ebaac-f5c6-4394-9c8b-e02c8ce0844d",
   "triggerCount": 0,
   "tags": [
     {
