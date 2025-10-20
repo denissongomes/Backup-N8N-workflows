@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-09-20T12:58:35.267Z",
-  "updatedAt": "2025-10-12T19:13:46.235Z",
+  "updatedAt": "2025-10-13T19:19:49.271Z",
   "id": "ib7w7KyNu8o6hxXo",
   "name": "Workana AI Agent",
   "active": true,
@@ -140,26 +140,6 @@
     },
     {
       "parameters": {
-        "model": "GPT-5-nano",
-        "options": {}
-      },
-      "id": "9d5cdfef-68bb-40bd-8c00-00d6039d8d95",
-      "name": "GPT-5-nano Chat Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "position": [
-        528,
-        672
-      ],
-      "typeVersion": 1,
-      "credentials": {
-        "openAiApi": {
-          "id": "c7JjRgSwZclMpl7P",
-          "name": "Poe account (denisson.dev)"
-        }
-      }
-    },
-    {
-      "parameters": {
         "pollTimes": {
           "item": [
             {
@@ -244,7 +224,7 @@
     },
     {
       "parameters": {
-        "sendTo": "denissongomes@outlook.com.br",
+        "sendTo": "denissongomes.dev@gmail.com",
         "subject": "=Assets Workana ID:{{ $('Get row(s) in sheet').item.json.id }} - {{ $('Get row(s) in sheet').item.json.title }}",
         "message": "={{ $json.output }}",
         "options": {
@@ -265,26 +245,6 @@
         "gmailOAuth2": {
           "id": "EbaLSvv4O8D8FmB6",
           "name": "Gmail Trigger (denisson.dev)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": "GPT-5-nano",
-        "options": {}
-      },
-      "id": "3f81f801-ad52-4471-b09f-d2d62d962961",
-      "name": "GPT-5-nano Chat Model1",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "position": [
-        1360,
-        528
-      ],
-      "typeVersion": 1,
-      "credentials": {
-        "openAiApi": {
-          "id": "c7JjRgSwZclMpl7P",
-          "name": "Poe account (denisson.dev)"
         }
       }
     },
@@ -482,6 +442,46 @@
           "name": "Google Sheets (denisson.dev)"
         }
       }
+    },
+    {
+      "parameters": {
+        "model": "GPT-5-mini",
+        "options": {}
+      },
+      "id": "9d5cdfef-68bb-40bd-8c00-00d6039d8d95",
+      "name": "GPT-5 mini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        528,
+        672
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "GPT-5-mini",
+        "options": {}
+      },
+      "id": "3f81f801-ad52-4471-b09f-d2d62d962961",
+      "name": "GPT-5 mini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1360,
+        528
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "a0SSSNDnz7vwvcGe",
+          "name": "Poe account (dnsgom)"
+        }
+      }
     }
   ],
   "connections": {
@@ -534,17 +534,6 @@
         ]
       ]
     },
-    "GPT-5-nano Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Google Sheets Trigger": {
       "main": [
         [
@@ -578,17 +567,6 @@
         ]
       ]
     },
-    "GPT-5-nano Chat Model1": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Email Writer AI",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Email Writer AI": {
       "main": [
         [
@@ -610,6 +588,28 @@
           }
         ]
       ]
+    },
+    "GPT-5 mini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-5 mini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Writer AI",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -619,15 +619,15 @@
     "node:Google Sheets Trigger": {
       "documentId": "1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio",
       "sheetId": 1879327603,
-      "lastRevision": 511,
-      "lastRevisionLink": "https://docs.google.com/spreadsheets/export?id=1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio&revision=511&exportFormat=xlsx"
+      "lastRevision": 600,
+      "lastRevisionLink": "https://docs.google.com/spreadsheets/export?id=1h53dXXxOlcFdRCiWS8fiyrysty_xz44zHqrauwQ2Cio&revision=600&exportFormat=xlsx"
     }
   },
   "meta": {
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "a122fda7-728d-443a-b72a-fabd0a8773fe",
+  "versionId": "a90fb887-a857-448c-9671-477ec7620d23",
   "triggerCount": 2,
   "tags": [
     {
