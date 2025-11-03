@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-09-30T10:53:46.289Z",
-  "updatedAt": "2025-10-08T17:49:40.004Z",
+  "updatedAt": "2025-10-31T11:17:37.993Z",
   "id": "5LKEQcMctFiVdseu",
   "name": "IA Agent Gmail Manager (Sort Old Emails)",
   "active": true,
@@ -467,9 +467,8 @@
       "parameters": {
         "model": {
           "__rl": true,
-          "value": "gpt-5-nano",
-          "mode": "list",
-          "cachedResultName": "gpt-5-nano"
+          "value": "Grok-4-Fast-Reasoning",
+          "mode": "id"
         },
         "options": {}
       },
@@ -483,8 +482,8 @@
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "T7SdYJmTjBBpMB7M",
-          "name": "OpenAi account (n8n-demo)"
+          "id": "c7JjRgSwZclMpl7P",
+          "name": "Poe account (denisson.dev)"
         }
       }
     },
@@ -647,7 +646,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "5dfa6912-e1f3-4f34-980a-a38e41d638cb",
+  "versionId": "a307514f-0785-432b-a9ca-7a7d225496ca",
   "triggerCount": 1,
   "tags": [
     {
