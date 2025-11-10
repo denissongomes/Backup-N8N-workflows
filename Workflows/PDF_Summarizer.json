@@ -1,0 +1,196 @@
+{
+  "createdAt": "2025-11-03T12:42:38.217Z",
+  "updatedAt": "2025-11-05T12:51:34.644Z",
+  "id": "GBCJqPF8ARWgJlT4",
+  "name": "PDF Summarizer",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {
+          "allowFileUploads": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        176
+      ],
+      "id": "e1cace5b-7b13-409a-93ff-19fd41e7cda1",
+      "name": "When chat message received",
+      "webhookId": "a787f33a-5eb3-4df4-9fc6-b5ac706172d1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "GPT-4.1",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=PDF:  {{ $json.text }}"
+            },
+            {
+              "content": "=Objetivo:\nVocê receberá um arquivo PDF. Sua tarefa é:\n\nProduzir um resumo detalhado, entre 1500 e 2000 palavras, destacando os pontos mais importantes para estudo.\nEm seguida, criar um quiz com 10 questões de múltipla escolha (A, B, C, D), cada uma com:\nEnunciado claro e objetivo.\nQuatro alternativas plausíveis (A–D).\nIndicação explícita da resposta correta.\nUm comentário explicativo curto citando trechos ou ideias-chave do conteúdo para justificar a resposta.\nInstruções detalhadas:\n\nLinguagem: português claro, formal, com precisão conceitual.\nPúblico-alvo: estudantes que irão revisar o conteúdo para provas.\nConsistência: garanta que cada questão se baseie diretamente no conteúdo do arquivo PDF, evitando inferências externas.\nCobertura: o resumo deve contemplar definição dos conceitos centrais, argumentos principais, evidências, exemplos relevantes, implicações práticas, controvérsias/limitações, e relações entre os tópicos.\nOrganização:\nTítulo do resumo.\nSeções com subtítulos descritivos.\nLista dos principais termos e definições (bullet points) ao final do resumo.\nQuiz após o resumo, em seção separada.\nEstilo do resumo:\nAbertura com visão geral do tema e objetivo do arquivo PDF.\nDesenvolvimento com encadeamento lógico e coesão.\nÊnfase nos pontos mais importantes para estudo (faça uma seção “Pontos-chave para revisão” com bullets).\nConclusão sintetizando aprendizados e possíveis aplicações.\nCitações: quando fizer referência a partes específicas, cite brevemente entre aspas (“...”) ou com indicação de seção/minutagem se fornecida.\nExtensão: entre 1500 e 2000 palavras (não menos que 1500 e não mais que 2000).\nQuiz:\nVarie os tipos de questão: definição, aplicação, interpretação de citação, relação de causa/efeito, verdadeiro/falso convertido em múltipla escolha.\nEm pelo menos 2 questões, use trechos literais do arquivo PDF para perguntar “A que conceito/parte se refere a seguinte passagem: ‘…’”.\nEvite alternativas óbvias; todas devem ser verossímeis.\nApós cada questão, indique:\nResposta: [A/B/C/D]\nComentário: uma breve justificativa, citando a passagem ou a ideia correspondente.\nFormatação de saída:\nUse cabeçalhos e listas para tornar o material escaneável.\nMantenha português do Brasil.\nNão inclua conteúdo não presente no arquivo PDF.\nEntrada fornecida:\n\nArquivo PDF: {{ $json.text }}.\nModelo de saída (exemplo de estrutura):\n\nResumo (1500–2000 palavras)\nTítulo\nIntrodução (contexto e objetivo)\nSeções temáticas (2–5 seções, com subtítulos)\nPontos-chave para revisão (bullet points)\nTermos e definições (bullet points)\nConclusão\nQuiz (10 questões)\nQuestão 1: [enunciado]\nA) [alternativa]\nB) [alternativa]\nC) [alternativa]\nD) [alternativa]\nResposta: [letra]\nComentário: [justificativa curta citando trecho/ideia]\n\nQuestão 2: …\n\n…\n\nQuestão 10: …\n\nCritérios de qualidade:\n\nFidelidade total ao conteúdo do arquivo PDF.\nClareza, concisão e precisão conceitual.\nAbrangência dos tópicos-chave.\nQuestões desafiadoras, com justificativas corretas e úteis para estudo.\nObservação:\nSe a transcrição estiver incompleta, indique as lacunas e evite extrapolar. Se houver minutagens, utilize-as para contextualizar as citações no resumo e nos comentários do quiz.\n\nExemplo do estilo de pergunta solicitado (adapte ao conteúdo do arquivo PDF):\n\n“A que parte do RNA se refere a seguinte parte do texto: ‘se baseia no modo como a estrutura é dada, de maneira a fazer com que o conhecimento experimental seja armazenado nessa estrutura, ou melhor dizendo, nas conexões sinápticas entre os neurônios (Haykin, 2001, p. 28).’”\nA) A estrutura.\nB) A programação.\nC) Ao texto.\nD) Ao algoritmo de aprendizagem.\nResposta: D\nComentário: “O algoritmo de aprendizagem, por sua vez, se baseia no modo como a estrutura é dada...”\n",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        336,
+        176
+      ],
+      "id": "0c58ea86-3006-413a-9443-7be5d4cefd63",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "jRTaT6o53FXZKMRv",
+          "name": "Poe account (davicorelli)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        128,
+        176
+      ],
+      "id": "54c247e9-ae3c-4775-96f4-98b0a569c2b1",
+      "name": "Extract from File",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "folderId": "=14fNRjKaLEHEsSP019F5GqRmPkVYGsaXl",
+        "title": "={{ $json.message.content.substr(0,78) }}"
+      },
+      "id": "0ef6ab0d-4910-4bb9-aafe-231c3590e50e",
+      "name": "Create Doc Filename is title",
+      "type": "n8n-nodes-base.googleDocs",
+      "position": [
+        672,
+        176
+      ],
+      "typeVersion": 2,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "nsu3cwKWu4EDuMmV",
+          "name": "Google Docs (denisson.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "locationChoice": "location",
+              "text": "={{ $('Message a model1').item.json.message.content }}"
+            }
+          ]
+        }
+      },
+      "id": "1abae6ba-e86e-47b5-8ed4-0e7f8fc09adb",
+      "name": "Add Final Article",
+      "type": "n8n-nodes-base.googleDocs",
+      "position": [
+        880,
+        176
+      ],
+      "typeVersion": 2,
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "nsu3cwKWu4EDuMmV",
+          "name": "Google Docs (denisson.dev)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Create Doc Filename is title",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Doc Filename is title": {
+      "main": [
+        [
+          {
+            "node": "Add Final Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "2b5fd364-d451-4c7b-b411-7b421e2613e1",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-09-06T18:51:55.029Z",
+      "updatedAt": "2025-10-08T17:55:04.973Z",
+      "id": "aqoahvvuwcUF7xAJ",
+      "name": "prod"
+    },
+    {
+      "createdAt": "2025-10-07T18:10:03.762Z",
+      "updatedAt": "2025-10-07T18:10:03.762Z",
+      "id": "pBpikzqjo5Xglfoj",
+      "name": "internal-infra"
+    }
+  ],
+  "n8n_host_name ": "https://n8n.trymyapp.tech/"
+}
