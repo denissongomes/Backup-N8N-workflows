@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-09-30T10:53:46.289Z",
-  "updatedAt": "2025-10-31T11:17:37.993Z",
+  "updatedAt": "2025-11-18T19:33:08.539Z",
   "id": "5LKEQcMctFiVdseu",
   "name": "IA Agent Gmail Manager (Sort Old Emails)",
   "active": true,
@@ -57,7 +57,8 @@
     },
     {
       "parameters": {
-        "jsonSchemaExample": "{\n  \"email_label\": \"business\"\n}"
+        "jsonSchemaExample": "{\n  \"email_label\": \"business\"\n}",
+        "autoFix": true
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
@@ -618,6 +619,11 @@
             "node": "Give a Label",
             "type": "ai_languageModel",
             "index": 0
+          },
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
           }
         ]
       ]
@@ -646,7 +652,7 @@
   },
   "meta": null,
   "pinData": {},
-  "versionId": "a307514f-0785-432b-a9ca-7a7d225496ca",
+  "versionId": "8d3b6e9e-edf8-402d-ab5a-46480359d2f2",
   "triggerCount": 1,
   "tags": [
     {
