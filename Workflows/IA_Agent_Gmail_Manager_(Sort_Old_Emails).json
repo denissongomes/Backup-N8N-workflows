@@ -1,9 +1,9 @@
 {
-  "createdAt": "2025-09-30T10:53:46.289Z",
-  "updatedAt": "2025-11-18T19:33:08.539Z",
-  "id": "5LKEQcMctFiVdseu",
+  "updatedAt": "2025-11-28T11:30:58.248Z",
+  "createdAt": "2025-11-27T22:38:36.492Z",
+  "id": "GPMka0Ou43Qk9jkn",
   "name": "IA Agent Gmail Manager (Sort Old Emails)",
-  "active": true,
+  "active": false,
   "isArchived": false,
   "nodes": [
     {
@@ -33,10 +33,10 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        496,
-        608
+        560,
+        592
       ],
-      "id": "d9f5f30a-866f-4c89-a038-af0cdb1e9e7e",
+      "id": "61148a25-eb38-4d55-9136-321b0c9f972f",
       "name": "Filter"
     },
     {
@@ -48,11 +48,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -64,
-        16
+        0,
+        0
       ],
       "typeVersion": 1,
-      "id": "6a5509e3-1117-434f-908e-d67e14f27c50",
+      "id": "21454340-877d-4006-81a0-ae10b94dfaa6",
       "name": "Sticky Note1"
     },
     {
@@ -63,10 +63,10 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        928,
-        832
+        992,
+        816
       ],
-      "id": "4b6c5bf7-886f-40b7-8be9-180519adc4d7",
+      "id": "06d70fe0-883f-4640-8a5d-2a5f2f3c3c75",
       "name": "Structured Output Parser"
     },
     {
@@ -81,10 +81,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.8,
       "position": [
-        752,
-        608
+        816,
+        592
       ],
-      "id": "332e3b4c-6fb2-49cf-864c-9b077e33f0c4",
+      "id": "44286438-b865-43ff-bcd3-7b7308b2506e",
       "name": "Give a Label",
       "retryOnFail": false
     },
@@ -273,10 +273,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        1168,
-        512
+        1232,
+        496
       ],
-      "id": "edd501e0-1bcb-4215-940b-a7d05d8fdf8c",
+      "id": "e6756f28-a00b-4af6-991b-66e4cd8342d4",
       "name": "Switch2"
     },
     {
@@ -290,15 +290,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1456,
-        992
+        1520,
+        976
       ],
-      "id": "8eb71c64-a97d-41b1-9994-359135347fcc",
+      "id": "11b9b95d-1895-4b12-bcc1-70694ed775ee",
       "name": "Administrative2",
       "webhookId": "70219a19-4705-493c-9291-527655dd8099",
       "credentials": {
         "gmailOAuth2": {
-          "id": "9q0q0MivOvl1yOFz",
+          "id": "8ulf2YipWXYEBbvM",
           "name": "Gmail (denisson.dev)"
         }
       }
@@ -314,15 +314,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1456,
-        176
+        1520,
+        160
       ],
-      "id": "c91b01bd-0ceb-482a-92ee-1d69d33615e7",
+      "id": "3bccda86-fbc7-4644-858e-42a02549e701",
       "name": "Priority2",
       "webhookId": "70219a19-4705-493c-9291-527655dd8099",
       "credentials": {
         "gmailOAuth2": {
-          "id": "9q0q0MivOvl1yOFz",
+          "id": "8ulf2YipWXYEBbvM",
           "name": "Gmail (denisson.dev)"
         }
       }
@@ -338,15 +338,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1456,
-        832
+        1520,
+        816
       ],
-      "id": "4d317502-fe9b-4538-b3a9-ce970b2fe8b2",
+      "id": "3109bac1-d4e4-4191-b063-94d9a453f6ea",
       "name": "Business2",
       "webhookId": "70219a19-4705-493c-9291-527655dd8099",
       "credentials": {
         "gmailOAuth2": {
-          "id": "9q0q0MivOvl1yOFz",
+          "id": "8ulf2YipWXYEBbvM",
           "name": "Gmail (denisson.dev)"
         }
       }
@@ -362,15 +362,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1456,
-        672
+        1520,
+        656
       ],
-      "id": "1fc6c3db-bf75-4129-9e22-bb6a76f7d76b",
+      "id": "2399b992-0d54-4a7f-925e-5e86ec5d1159",
       "name": "Newsletter2",
       "webhookId": "70219a19-4705-493c-9291-527655dd8099",
       "credentials": {
         "gmailOAuth2": {
-          "id": "9q0q0MivOvl1yOFz",
+          "id": "8ulf2YipWXYEBbvM",
           "name": "Gmail (denisson.dev)"
         }
       }
@@ -386,15 +386,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1456,
-        336
+        1520,
+        320
       ],
-      "id": "5e1ab4d8-b9d8-4005-aa02-da8bc2da1927",
+      "id": "7ebfd135-869d-4403-8ce3-65fd127996b5",
       "name": "Personal2",
       "webhookId": "70219a19-4705-493c-9291-527655dd8099",
       "credentials": {
         "gmailOAuth2": {
-          "id": "9q0q0MivOvl1yOFz",
+          "id": "8ulf2YipWXYEBbvM",
           "name": "Gmail (denisson.dev)"
         }
       }
@@ -410,15 +410,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1456,
-        496
+        1520,
+        480
       ],
-      "id": "51b9e778-b6c6-4385-816f-6bccbf3dc0c8",
+      "id": "433e13d3-c783-495e-baca-aafba4e5995a",
       "name": "Notifications2",
       "webhookId": "70219a19-4705-493c-9291-527655dd8099",
       "credentials": {
         "gmailOAuth2": {
-          "id": "9q0q0MivOvl1yOFz",
+          "id": "8ulf2YipWXYEBbvM",
           "name": "Gmail (denisson.dev)"
         }
       }
@@ -434,15 +434,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1456,
-        1152
+        1520,
+        1136
       ],
-      "id": "5e0df79e-eb7e-4609-b5d8-f4275b6f614f",
+      "id": "636f4860-9335-49b5-bfdf-ceb97d109639",
       "name": "Spam1",
       "webhookId": "70219a19-4705-493c-9291-527655dd8099",
       "credentials": {
         "gmailOAuth2": {
-          "id": "9q0q0MivOvl1yOFz",
+          "id": "8ulf2YipWXYEBbvM",
           "name": "Gmail (denisson.dev)"
         }
       }
@@ -458,10 +458,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        80,
-        608
+        144,
+        592
       ],
-      "id": "bb5fe3e5-9fe5-4594-ad16-82f3f2940850",
+      "id": "d67b143f-6793-4395-9388-d2952c386577",
       "name": "Schedule Trigger"
     },
     {
@@ -476,15 +476,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
       "position": [
-        720,
-        832
+        784,
+        816
       ],
-      "id": "0b599b79-9241-401b-bf87-18b0dad11dc2",
+      "id": "8604b4e8-8d78-47f8-a39d-4e9822739aa6",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "c7JjRgSwZclMpl7P",
-          "name": "Poe account (denisson.dev)"
+          "id": "Duhnhs1X6eqmfHrE",
+          "name": "Poe account (moneysite)"
         }
       }
     },
@@ -500,15 +500,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        272,
-        608
+        336,
+        592
       ],
-      "id": "c1bfa0f5-01aa-43d3-9205-1cd0eb4c4d43",
+      "id": "5964c67a-989c-4dc6-9110-168ae6e8e9b1",
       "name": "Get many messages",
       "webhookId": "a0511bfe-4783-4d8a-a297-c1d75fba8f02",
       "credentials": {
         "gmailOAuth2": {
-          "id": "9q0q0MivOvl1yOFz",
+          "id": "8ulf2YipWXYEBbvM",
           "name": "Gmail (denisson.dev)"
         }
       }
@@ -643,29 +643,34 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "staticData": {
-    "node:Schedule Trigger": {
-      "recurrenceRules": [
-        6
-      ]
-    }
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
   },
-  "meta": null,
   "pinData": {},
-  "versionId": "8d3b6e9e-edf8-402d-ab5a-46480359d2f2",
-  "triggerCount": 1,
+  "versionId": "df46583e-3d2c-44d0-9dc2-a8607d0deca0",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-27T22:38:36.492Z",
+      "createdAt": "2025-11-27T22:38:36.492Z",
+      "role": "workflow:owner",
+      "workflowId": "GPMka0Ou43Qk9jkn",
+      "projectId": "CK6XEsloykybki2p"
+    }
+  ],
   "tags": [
     {
-      "createdAt": "2025-10-07T18:10:03.762Z",
-      "updatedAt": "2025-10-07T18:10:03.762Z",
-      "id": "pBpikzqjo5Xglfoj",
-      "name": "internal-infra"
+      "updatedAt": "2025-11-27T22:32:06.122Z",
+      "createdAt": "2025-11-27T22:32:06.122Z",
+      "id": "lf6jGzaXcolij5dW",
+      "name": "prod"
     },
     {
-      "createdAt": "2025-09-06T18:51:55.029Z",
-      "updatedAt": "2025-10-08T17:55:04.973Z",
-      "id": "aqoahvvuwcUF7xAJ",
-      "name": "prod"
+      "updatedAt": "2025-11-27T22:30:51.794Z",
+      "createdAt": "2025-11-27T22:30:51.794Z",
+      "id": "V4F4G6t2C5blKSYh",
+      "name": "internal-infra"
     }
   ],
   "n8n_host_name ": "https://n8n.trymyapp.tech/"
