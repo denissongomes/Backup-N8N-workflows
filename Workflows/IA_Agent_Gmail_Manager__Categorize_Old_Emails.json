@@ -1,0 +1,655 @@
+{
+  "updatedAt": "2025-11-27T22:35:35.507Z",
+  "createdAt": "2025-11-27T18:38:42.537Z",
+  "id": "fQWWSQeGAYmZ1mad",
+  "name": "IA Agent Gmail Manager: Categorize Old Emails",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Categorize Old Emails\n## Executed after IA Agent Gmail Manager ",
+        "height": 1320,
+        "width": 2060
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "554f9e8a-9fe1-4f7c-829b-b69d2b4ac6e6",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5aa10b47-6c05-4661-adf8-bfcfc859680d",
+              "leftValue": "={{ $json.labelIds }}",
+              "rightValue": "Label_5840525390466228947",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "ed19591f-7618-4254-b358-f2d15c48c0c1",
+              "leftValue": "={{ $json.labelIds }}",
+              "rightValue": "Label_3126188913449887222",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1008,
+        592
+      ],
+      "id": "e0b06c29-e11f-43b7-a0c6-e0814a413500",
+      "name": "Label Checker"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "84ec2be6-ad6b-4ad4-8f8b-d31fafbfad20",
+                    "leftValue": "={{ $json.headers.to }}",
+                    "rightValue": "denissongomes.dev@gmail.com",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Gmail"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9b600943-3604-4851-b84d-4da0948da2ef",
+                    "leftValue": "={{ $json.headers.to }}",
+                    "rightValue": "=denissongomes@outlook.com.br",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Outlook"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1248,
+        592
+      ],
+      "id": "af0503fe-3cf6-4763-97c0-9cc6935adbef",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_3126188913449887222"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1536,
+        704
+      ],
+      "id": "b3e3cc37-97d8-4347-95d7-0cde12078ff2",
+      "name": "Outlook",
+      "webhookId": "70219a19-4705-493c-9291-527655dd8099",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        144,
+        608
+      ],
+      "id": "04666c5f-a6c6-427e-8467-bcfa34d030cf",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_5840525390466228947"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1536,
+        464
+      ],
+      "id": "e8d5f252-829c-4c89-9588-b1a695aa7354",
+      "name": "Add label to message",
+      "webhookId": "70219a19-4705-493c-9291-527655dd8099",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1744,
+        464
+      ],
+      "id": "0d67e91a-a570-40d7-a941-f485344fff32",
+      "name": "Remove label from message",
+      "webhookId": "1e5eeac3-14b6-4629-b31f-59f30c443a7c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1744,
+        704
+      ],
+      "id": "e4684cd0-da15-44d2-9cc0-be93e344cb3e",
+      "name": "Remove label from message1",
+      "webhookId": "1e5eeac3-14b6-4629-b31f-59f30c443a7c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        800,
+        528
+      ],
+      "id": "926614ea-14d0-4b53-a9f4-3de3a8800655",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "Label_498548493936868391"
+          ],
+          "readStatus": "read",
+          "receivedAfter": "2025-10-01T00:00:00"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        144
+      ],
+      "id": "37c5a4e5-4093-4a61-8642-ea5152defaa6",
+      "name": "Get Priority messages",
+      "webhookId": "a0511bfe-4783-4d8a-a297-c1d75fba8f02",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "Label_5009699674848382269"
+          ],
+          "readStatus": "read",
+          "receivedAfter": "2025-10-01T00:00:00"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        304
+      ],
+      "id": "756efe0b-e277-4031-b805-b9f7cfe1e35e",
+      "name": "Get Personal messages",
+      "webhookId": "a0511bfe-4783-4d8a-a297-c1d75fba8f02",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "Label_43"
+          ],
+          "readStatus": "read",
+          "receivedAfter": "2025-10-01T00:00:00"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        464
+      ],
+      "id": "307967e2-249d-4650-8f8e-5ffd6472fff1",
+      "name": "Get Notifications messages",
+      "webhookId": "a0511bfe-4783-4d8a-a297-c1d75fba8f02",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "Label_42"
+          ],
+          "readStatus": "read",
+          "receivedAfter": "2025-10-01T00:00:00"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        608
+      ],
+      "id": "c82ecee5-f662-4461-9a21-2d9628d3a89e",
+      "name": "Get Newsletter messages",
+      "webhookId": "a0511bfe-4783-4d8a-a297-c1d75fba8f02",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "Label_41"
+          ],
+          "readStatus": "read",
+          "receivedAfter": "2025-10-01T00:00:00"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        784
+      ],
+      "id": "aa2b60a8-62b4-47f3-9135-42d6699411cc",
+      "name": "Get Business messages",
+      "webhookId": "a0511bfe-4783-4d8a-a297-c1d75fba8f02",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "Label_125258354434871093"
+          ],
+          "readStatus": "read",
+          "receivedAfter": "2025-10-01T00:00:00"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        960
+      ],
+      "id": "bec05343-896a-48f0-a658-db9c6190ff43",
+      "name": "Get Administrative messages",
+      "webhookId": "a0511bfe-4783-4d8a-a297-c1d75fba8f02",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8ulf2YipWXYEBbvM",
+          "name": "Gmail (denissongomes.dev)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Label Checker": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Outlook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outlook": {
+      "main": [
+        [
+          {
+            "node": "Remove label from message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Priority messages",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Personal messages",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Notifications messages",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Newsletter messages",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Business messages",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Administrative messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label to message": {
+      "main": [
+        [
+          {
+            "node": "Remove label from message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Label Checker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Priority messages": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Personal messages": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get Notifications messages": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Get Newsletter messages": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Get Business messages": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Get Administrative messages": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a6b4346e-6414-42fe-b4b3-ccea36d56fbe",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2025-11-27T18:38:42.537Z",
+      "createdAt": "2025-11-27T18:38:42.537Z",
+      "role": "workflow:owner",
+      "workflowId": "fQWWSQeGAYmZ1mad",
+      "projectId": "CK6XEsloykybki2p"
+    }
+  ],
+  "tags": [
+    {
+      "updatedAt": "2025-11-27T22:32:06.122Z",
+      "createdAt": "2025-11-27T22:32:06.122Z",
+      "id": "lf6jGzaXcolij5dW",
+      "name": "prod"
+    },
+    {
+      "updatedAt": "2025-11-27T22:30:51.794Z",
+      "createdAt": "2025-11-27T22:30:51.794Z",
+      "id": "V4F4G6t2C5blKSYh",
+      "name": "internal-infra"
+    }
+  ],
+  "n8n_host_name ": "https://n8n.trymyapp.tech/"
+}
